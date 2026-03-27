@@ -4,7 +4,7 @@ import Home from "../Home";
 import SingleMovie from "../Pages/SingleMovie";
 import { urls } from "../data";
 import Header from "./Header";
-import WatchList from "../Pages/WatchList";
+import WatchList from "../Pages/Watchlist";
 import Footer from "./Fotter";
 import { createContext, useState } from "react";
 
