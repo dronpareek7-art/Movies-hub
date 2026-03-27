@@ -10,7 +10,7 @@ function SingleMovie() {
   const [trailerKey, setTrailerkey] = useState(null);
   const [Showtrailer, setShowTrailer] = useState(false);
 
-  const { Addtowatchlist } = useContext(Moviecontext);
+  const { Addtowatchlist  } = useContext(Moviecontext);
 
   useEffect(() => {
     fetchMovie();
@@ -51,13 +51,21 @@ function SingleMovie() {
     if (trailer) {
       setTrailerkey(trailer.key);
       setShowTrailer(true); // open
+      console.log(trailer)
     }
   }
 
   if (!movie) return <h2 className="loading">Loading Movie... 🎬</h2>;
 
   return (
-    <div className="single-movie">
+    <div
+    className="single-movie"
+    style={{
+      backgroundImage: movie.backdrop_path
+        ? `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`
+        : `url(https://image.tmdb.org/t/p/w500${movie.poster_path})`,
+    }}
+  >
       <div className="movie-container">
         <img
           className="movie-poster"
@@ -68,13 +76,16 @@ function SingleMovie() {
         <div className="movie-details">
           <h1 className="movie-title">{movie.title}</h1>
 
-          <p className="movie-overview">{movie.overview}</p>
+          <p className="movie-overview"><span className="details-heading">Description:</span>{movie.overview}</p>
 
-          <p className="movie-info">⭐ Rating: {movie.vote_average}</p>
-          <p className="movie-info">📅 Release: {movie.release_date}</p>
+          <p className="movie-info">⭐ <span className="details-heading">Rating: </span> {movie.vote_average}</p>
+          <p className="movie-info">📅 <span className="details-heading">Release Date: </span>{movie.release_date}</p>
           <p className="movie-info">
-            Language : {movie.spoken_languages[0].name}
+           <span className="details-heading">Movie Language: </span> {movie.spoken_languages[0].name}
           </p>
+          <p className="movie-info"> <span className="details-heading"> Genres:</span>{movie.genres[0].name} , {movie.genres[1].name} , {movie.genres[2].name}</p>
+          
+          
           <button onClick={handleTrailer} className="trailer-btn">
             {Showtrailer ? "Close Trailer" : "Watch Trailer"}
           </button>
@@ -84,15 +95,20 @@ function SingleMovie() {
           >
             {" "}
             <BsBookmarkPlusFill size={16} />
-            Add to watchlist
+            Add To Watchlist
           </button>
           {Showtrailer && trailerKey && (
-            <div className="trailer-box">
-              <iframe
-                src={`https://www.youtube.com/embed/${trailerKey}`}
-                title="Trailer"
-                allowFullScreen
-              ></iframe>
+            <div className="trailer-modal">
+              <div className="trailer-content">
+                <button className="close-btn"  onClick={() => setShowTrailer(false)}> ✖
+                </button>
+
+                <iframe
+                  src={`https://www.youtube.com/embed/${trailerKey}`}
+                  title="Trailer"
+                  allowFullScreen
+                ></iframe>
+              </div>
             </div>
           )}
         </div>

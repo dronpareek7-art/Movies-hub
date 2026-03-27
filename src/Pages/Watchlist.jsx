@@ -1,11 +1,11 @@
-import React from 'react'
-import { baseImageUrl } from '../data';
-import { Moviecontext } from '../Component/Router';
-import { Link } from 'react-router-dom';
-import { useContext } from 'react';
+import React from "react";
+import { baseImageUrl } from "../data";
+import { Moviecontext } from "../Component/Router";
+import { Link } from "react-router-dom";
+import { useContext } from "react";
+import "./Watchlist.css";
 
 const WatchList = () => {
-
   const { Watchlist } = useContext(Moviecontext);
 
   function trimContent(content) {
@@ -14,27 +14,24 @@ const WatchList = () => {
   }
 
   return (
-    <div className="home-section">
+    <div className="watchlist-section">
+      <h2 className="watchlist-heading">Your WatchList</h2>
 
-      <h2>Your WatchList</h2>
-
-      <div className="movie-grid">
-
-        {Watchlist.length > 0 ? (Watchlist.map((item) => (
-
-            <div key={item.id} className="movie-card">
-
+      <div className="watchlist-grid">
+        {Watchlist.length > 0 ? (
+          Watchlist.map((item) => (
+            <div key={item.id} className="watchlist-card">
               {item.poster_path && (
                 <Link to={`/movie/${item.id}`}>
                   <img
                     src={`${baseImageUrl}${item.poster_path}`}
                     alt={item.title}
+                    className="watchlist-img"
                   />
                 </Link>
               )}
 
-              <div className="content">
-
+              <div className="watchlist-content">
                 <h3>{trimContent(item.title || item.name)}</h3>
 
                 <p>
@@ -46,20 +43,15 @@ const WatchList = () => {
                       })
                     : ""}
                 </p>
-
               </div>
-
             </div>
           ))
-
         ) : (
-          <p>No movies in WatchList 😢</p>
+          <p className="empty-msg">No movies in WatchList 😢</p>
         )}
-
       </div>
-
     </div>
   );
 };
 
-export default WatchList
+export default WatchList;
