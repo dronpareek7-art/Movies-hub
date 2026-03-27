@@ -1,18 +1,22 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { baseImageUrl } from "./data";
 import "./Home.css";
 import { useNavigate } from "react-router-dom";
+import { BsBookmarkPlusFill } from "react-icons/bs";
+import { Moviecontext } from "./Component/Router";
+import { Link } from "react-router-dom";
+
 function Home({ urls, heading, btn1, btn2 }) {
   const [movieData, setMovieData] = useState([]);
   const [showData, setShowData] = useState(urls[0]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  let {Addtowatchlist} = useContext(Moviecontext)
 
   const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchMovies() {
       try {
-        setLoading(true);
         const response = await fetch(showData);
         const result = await response.json();
         setMovieData(result.results || []);
@@ -25,9 +29,7 @@ function Home({ urls, heading, btn1, btn2 }) {
 
     fetchMovies();
   }, [showData]);
-  if (loading) {
-    <h2>loading...</h2>;
-  }
+
   function trimContent(content) {
     if (content.length > 20) {
       return content.slice(0, 20) + "...";
@@ -50,7 +52,9 @@ function Home({ urls, heading, btn1, btn2 }) {
       </header>
 
       <div className="movie-grid">
-        {movieData.length > 0 ? (
+        {loading ? (
+          <p>Loading....</p>
+        ) : movieData.length > 0 ? (
           movieData.map((item) => (
             <div key={item.id} className="movie-card">
               {item.poster_path && (
@@ -73,7 +77,9 @@ function Home({ urls, heading, btn1, btn2 }) {
                         day: "2-digit",
                       })
                     : ""}
-                </p>
+                </p>  
+                 <button onClick={()=>Addtowatchlist(item)}>  < BsBookmarkPlusFill/> </button>
+            
               </div>
             </div>
           ))
