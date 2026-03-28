@@ -13,7 +13,6 @@ body {
 .home-section {
   padding: 20px;
   background: radial-gradient(circle at top, #020617, #0f172a);
-  min-height: 100vh;
   color: #fff;
 }
 
