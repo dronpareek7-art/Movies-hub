@@ -7,11 +7,12 @@
 body {
   background-color: #0f172a;
   font-family: sans-serif;
+  overflow-x: hidden;
 }
 
 .home-section {
   padding: 20px 40px;
-  background-color: #0f172a;
+  background: radial-gradient(circle at top, #020617, #0f172a);
   min-height: 100vh;
   color: #fff;
 }
@@ -24,18 +25,24 @@ body {
 }
 
 .home-header h2 {
-  font-size: 24px;
-  font-weight: 600;
-}
-.toggle-buttons {
-  display: flex;
-  gap: 10px;
-  background: #1e293b;
-  padding: 4px;
-  border-radius: 25px;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+
+  background: linear-gradient(to right, #fff, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* default */
+.toggle-buttons {
+  display: inline-flex;
+  gap: 6px;
+  background: rgba(30, 41, 59, 0.8);
+  padding: 5px;
+  border-radius: 30px;
+  backdrop-filter: blur(10px);
+}
+
 .toggle-buttons button {
   padding: 8px 18px;
   border: none;
@@ -44,35 +51,43 @@ body {
   color: #cbd5e1;
   cursor: pointer;
   transition: all 0.3s ease;
+  min-width: 80px;
 }
 
-/* hover */
 .toggle-buttons button:hover {
   color: white;
 }
 
-/* 🔥 ACTIVE BUTTON */
 .active-btn {
   background: linear-gradient(to right, #3b82f6, #2563eb);
   color: white;
   box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5);
 }
 
-
 .movie-slider {
   display: flex;
   gap: 20px;
   overflow-x: auto;
   scroll-behavior: smooth;
-  padding: 10px 0;
+  padding: 10px 10px;
 }
 
 .movie-slider::-webkit-scrollbar {
   display: none;
 }
+.movie-slider::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 40px;
+  background: linear-gradient(to left, #0f172a, transparent);
+}
 
 .movie-slider {
   scroll-snap-type: x mandatory;
+  scroll-padding-left: 10px;
 }
 
 .movie-card {
@@ -98,11 +113,15 @@ body {
   width: 100%;
   height: 260px;
   object-fit: cover;
-  transition: 0.3s;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+  opacity: 0.9;
 }
 
 .poster-wrapper:hover img {
   transform: scale(1.05);
+  opacity: 1;
 }
 
 .watchlist-icon {
@@ -141,12 +160,13 @@ body {
 }
 
 .content {
-  padding: 10px;
+  padding: 12px;
 }
 
 .content h3 {
   font-size: 14px;
   margin-bottom: 5px;
+  line-height: 1.3;
 }
 
 .content p {
@@ -154,64 +174,95 @@ body {
   color: #94a3b8;
 }
 
-.slider-controls {
-  position: relative;
-  margin-bottom: 10px;
-}
-
-.slider-controls button {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
-
-  width: 40px;
-  height: 40px;
-
-  border-radius: 50%;
-  border: none;
-
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(6px);
-
-  color: white;
-  font-size: 18px;
-
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.slider-controls button:first-child {
-  left: 1px;
-  top: 160px;
-}
-
-.slider-controls button:last-child {
-  right: 1px;
-  top: 160px;
-}
-
-.slider-controls button:hover {
-  background: #6e3c3f;
-  transform: translateY(-50%) scale(1.1);
+.home-section {
+  padding: 20px 40px;
 }
 
 @media (max-width: 768px) {
+  .home-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .home-header h2 {
+    font-size: 20px;
+  }
+
+  .toggle-buttons {
+    width: auto;
+
+    margin-left: auto;
+  }
+
+  .toggle-buttons button {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-section {
+    padding: 15px;
+  }
+
+  .movie-card {
+    min-width: 130px;
+  }
+
+  .poster-wrapper img {
+    height: 180px;
+  }
+
+  .content h3 {
+    font-size: 12px;
+  }
+
+  .content p {
+    font-size: 10px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 1024px) {
   .home-section {
     padding: 20px;
   }
 
   .movie-card {
-    min-width: 140px;
+    min-width: 160px;
   }
 
   .poster-wrapper img {
-    height: 200px;
+    height: 220px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .movie-card {
+    min-width: 200px;
   }
 
-  .slider-controls button {
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
+  .poster-wrapper img {
+    height: 280px;
+  }
+
+  .content h3 {
+    font-size: 15px;
+  }
+
+  .content p {
+    font-size: 13px;
+  }
+}
+
+@media (hover: none) {
+  .watchlist-icon {
+    opacity: 1; 
+  }
+}
+@media (hover: hover) {
+  .movie-card:hover {
+    transform: scale(1.05);
+    background: rgba(0, 0, 0, 0.7);
   }
 }

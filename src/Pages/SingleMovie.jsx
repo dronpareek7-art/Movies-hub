@@ -81,9 +81,9 @@ function SingleMovie() {
           <p className="movie-info">⭐ <span className="details-heading">Rating: </span> {movie.vote_average}</p>
           <p className="movie-info">📅 <span className="details-heading">Release Date: </span>{movie.release_date}</p>
           <p className="movie-info">
-           <span className="details-heading">Movie Language: </span> {movie.spoken_languages[0].name}
+           <span className="details-heading">Movie Language: </span> {movie.spoken_languages[0].name || "N/A"}
           </p>
-          <p className="movie-info"> <span className="details-heading"> Genres:</span>{movie.genres[0].name} , {movie.genres[1].name} , {movie.genres[2].name}</p>
+          <p className="movie-info"> <span className="details-heading"> Genres:</span>{movie.genres?.map((g) => g.name).join(", ") || "N/A"}</p>
           
           
           <button onClick={handleTrailer} className="trailer-btn">

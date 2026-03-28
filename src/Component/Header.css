@@ -1,79 +1,116 @@
+/* ========================= */
+/* 🔥 RESET */
+/* ========================= */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* ========================= */
+/* 🔥 HEADER */
+/* ========================= */
 .header {
   width: 100%;
-  height: 75px;
+  height: 70px;
+
   background: linear-gradient(90deg, #0f172a, #020617);
   backdrop-filter: blur(12px);
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 40px;
+
+  padding: 0 30px;
+  gap: 20px;
+
   position: sticky;
   top: 0;
   z-index: 1000;
 
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
 }
 
+/* ========================= */
+/* 🎬 LOGO */
+/* ========================= */
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+
   font-size: 22px;
   font-weight: 700;
-  color: #f43f5e;
+
+  background: linear-gradient(to right, #f43f5e, #fb7185);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
   text-decoration: none;
   transition: 0.3s;
 }
 
 .logo svg {
-  font-size: 26px;
+  font-size: 24px;
+  color: #f43f5e;
 }
 
 .logo:hover {
-  color: #fb7185;
   transform: scale(1.05);
 }
 
+/* ========================= */
+/* 🔍 SEARCH */
+/* ========================= */
 .search-bar {
-  position: relative;
+  flex: 1;
   display: flex;
-  align-items: center;
+  justify-content: center;
 }
 
-.search-bar input {
-  width: 280px;
-  padding: 10px 45px 10px 16px;
-
-  border-radius: 25px;
-  border: none;
-  outline: none;
+.search-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
 
   background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  font-size: 14px;
+  border-radius: 25px;
+  overflow: hidden;
 
   transition: 0.3s;
 }
 
-.search-btn {
-  position: absolute;
-  right: 5px;
+.search-wrapper:focus-within {
+  box-shadow: 0 0 12px rgba(244, 63, 94, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+}
 
-  height: 80%;
-  width: 38px;
+.search-wrapper input {
+  flex: 1;
+  padding: 10px 15px;
 
   border: none;
-  border-radius: 50%;
+  outline: none;
 
-  background: #f43f5e;
-  color: #fff;
+  background: transparent;
+  color: white;
+  font-size: 14px;
+}
+
+.search-wrapper input::placeholder {
+  color: #94a3b8;
+}
+
+/* 🔍 BUTTON */
+.search-btn {
+  width: 42px;
+  height: 42px;
+
+  border: none;
+  background: linear-gradient(135deg, #f43f5e, #e11d48);
+  color: white;
 
   display: flex;
   align-items: center;
@@ -88,64 +125,51 @@
 }
 
 .search-btn:hover {
-  background: #e11d48;
   transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(244, 63, 94, 0.6);
 }
 
-.search-bar input:focus {
-  width: 320px;
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 10px rgba(244, 63, 94, 0.3);
-}
-.search-bar input {
-  width: 280px;
-  padding: 10px 16px;
-  border-radius: 25px;
-  border: none;
-  outline: none;
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  font-size: 14px;
-  transition: 0.3s;
-}
-
-.search-bar input::placeholder {
-  color: #cbd5f5;
-}
-
-.search-bar input:focus {
-  width: 320px;
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 10px rgba(244, 63, 94, 0.3);
-}
-
+/* ========================= */
+/* 🔗 NAV LINKS */
+/* ========================= */
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 18px;
 }
 
+/* links */
 .nav-links a {
   position: relative;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
   text-decoration: none;
   color: #cbd5f5;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
+
   transition: 0.3s;
 }
 
+/* hover */
 .nav-links a:hover {
   color: #fff;
 }
 
+/* 🔥 UNDERLINE EFFECT */
 .nav-links a::after {
   content: "";
   position: absolute;
   left: 0;
-  bottom: -5px;
+  bottom: -4px;
+
   width: 0%;
   height: 2px;
-  background: #f43f5e;
+
+  background: linear-gradient(to right, #f43f5e, #fb7185);
   transition: 0.3s ease;
 }
 
@@ -153,55 +177,78 @@
   width: 100%;
 }
 
-.nav-links .login {
+/* ========================= */
+/* 🔥 LOGIN BUTTON */
+/* ========================= */
+.login {
   padding: 8px 18px;
   border-radius: 20px;
 
   background: linear-gradient(135deg, #f43f5e, #e11d48);
-  color: #fff !important;
+  color: white !important;
+
   font-weight: 600;
 
-  transition: 0.3s;
   box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
+  transition: 0.3s;
 }
 
-.nav-links .login::after {
+.login::after {
   display: none;
 }
 
-.nav-links .login:hover {
-  background: linear-gradient(135deg, #fb7185, #f43f5e);
+.login:hover {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 18px rgba(244, 63, 94, 0.5);
+  box-shadow: 0 6px 18px rgba(244, 63, 94, 0.6);
 }
 
+/* ========================= */
+/* 📱 TABLET */
+/* ========================= */
 @media (max-width: 768px) {
   .header {
     padding: 0 20px;
   }
 
-  .search-bar input {
-    width: 200px;
-  }
-
-  .search-bar input:focus {
-    width: 240px;
-  }
-}
-
-@media (max-width: 480px) {
-  .header {
-    flex-direction: column;
-    height: auto;
-    padding: 15px;
-    gap: 12px;
-  }
-
-  .search-bar input {
-    width: 100%;
+  .search-wrapper {
+    max-width: 240px;
   }
 
   .nav-links {
     gap: 12px;
+  }
+}
+
+/* ========================= */
+/* 📱 MOBILE */
+/* ========================= */
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+
+    height: auto;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  /* logo */
+  .logo {
+    align-self: flex-start;
+  }
+
+  /* search full */
+  .search-bar {
+    width: 100%;
+  }
+
+  .search-wrapper {
+    max-width: 100%;
+  }
+
+  /* nav bottom */
+  .nav-links {
+    width: 100%;
+    justify-content: space-between;
   }
 }

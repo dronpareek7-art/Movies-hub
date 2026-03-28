@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, useRef } from "react";
+import { useContext, useEffect, useState} from "react";
 import { baseImageUrl } from "./data";
 import "./Home.css";
 import { useNavigate } from "react-router-dom";
@@ -35,16 +35,6 @@ function Home({ urls, heading, btn1, btn2 }) {
     return content;
   }
 
-  const sliderRef = useRef();
-
-  function scrollLeft() {
-    sliderRef.current.scrollBy({ left: -600, behavior: "smooth" });
-  }
-
-  function scrollRight() {
-    sliderRef.current.scrollBy({ left: 600, behavior: "smooth" });
-  }
-
   return (
     <section className="home-section">
       <header className="home-header">
@@ -67,12 +57,8 @@ function Home({ urls, heading, btn1, btn2 }) {
         </div>
       </header>
 
-      <div className="slider-controls">
-        <button onClick={() => scrollLeft()}>⬅</button>
-        <button onClick={() => scrollRight()}>➡</button>
-      </div>
-
-      <div className="movie-slider" ref={sliderRef}>
+     
+      <div className="movie-slider" >
         {loading ? (
           <p>Loading....</p>
         ) : movieData.length > 0 ? (
