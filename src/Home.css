@@ -91,7 +91,7 @@ body {
   background-color: #1e293b;
   border-radius: 12px;
   overflow: hidden;
-  transition: 0.3s;
+  transition: 0.3s all linear;
 }
 
 .movie-card:hover {
@@ -107,23 +107,53 @@ body {
   height: 200px;
   object-fit: cover;
 }
+
 .watchlist-icon {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 10px;
+  left: 10px;
 
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
 
   background: rgba(0, 0, 0, 0.6);
-  border-radius: 8px;
-  color: white;
+  backdrop-filter: blur(6px);
+
+  border: none;
+  border-radius: 10px;
+
+  color: #fff;
 
   display: flex;
   justify-content: center;
   align-items: center;
 
-  border: none;
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.poster-wrapper:hover .watchlist-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 🔥 HOVER EFFECT */
+.watchlist-icon:hover {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  transform: scale(1.15);
+
+  box-shadow:
+    0 0 10px rgba(239, 68, 68, 0.7),
+    0 0 20px rgba(239, 68, 68, 0.5);
+}
+
+/* 🔥 click feel */
+.watchlist-icon:active {
+  transform: scale(0.95);
 }
 
 .content {
@@ -206,5 +236,11 @@ body {
     text-align: center;
     font-size: 12px;
     padding: 6px 0;
+  }
+}
+@media (hover: none) {
+  .watchlist-icon {
+    opacity: 1;
+    transform: scale(1);
   }
 }

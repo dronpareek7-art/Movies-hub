@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import "./SingleMovie.css";
 import { BsBookmarkPlusFill } from "react-icons/bs";
 import { useContext } from "react";
@@ -10,7 +10,7 @@ function SingleMovie() {
   const [trailerKey, setTrailerkey] = useState(null);
   const [Showtrailer, setShowTrailer] = useState(false);
 
-  const { Addtowatchlist  } = useContext(Moviecontext);
+  const { Addtowatchlist } = useContext(Moviecontext);
 
   useEffect(() => {
     fetchMovie();
@@ -32,7 +32,7 @@ function SingleMovie() {
   }
   async function handleTrailer() {
     if (Showtrailer) {
-      setShowTrailer(false); // close
+      setShowTrailer(false);
       return;
     }
 
@@ -50,8 +50,8 @@ function SingleMovie() {
 
     if (trailer) {
       setTrailerkey(trailer.key);
-      setShowTrailer(true); // open
-      console.log(trailer)
+      setShowTrailer(true); 
+      console.log(trailer);
     }
   }
 
@@ -59,13 +59,13 @@ function SingleMovie() {
 
   return (
     <div
-    className="single-movie"
-    style={{
-      backgroundImage: movie.backdrop_path
-        ? `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`
-        : `url(https://image.tmdb.org/t/p/w500${movie.poster_path})`,
-    }}
-  >
+      className="single-movie"
+      style={{
+        backgroundImage: movie.backdrop_path
+          ? `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`
+          : `url(https://image.tmdb.org/t/p/w500${movie.poster_path})`,
+      }}
+    >
       <div className="movie-container">
         <img
           className="movie-poster"
@@ -76,16 +76,29 @@ function SingleMovie() {
         <div className="movie-details">
           <h1 className="movie-title">{movie.title}</h1>
 
-          <p className="movie-overview"><span className="details-heading">Description:</span>{movie.overview}</p>
-
-          <p className="movie-info">⭐ <span className="details-heading">Rating: </span> {movie.vote_average}</p>
-          <p className="movie-info">📅 <span className="details-heading">Release Date: </span>{movie.release_date}</p>
-          <p className="movie-info">
-           <span className="details-heading">Movie Language: </span> {movie.spoken_languages[0].name || "N/A"}
+          <p className="movie-overview">
+            <span className="details-heading">Description:</span>
+            {movie.overview}
           </p>
-          <p className="movie-info"> <span className="details-heading"> Genres:</span>{movie.genres?.map((g) => g.name).join(", ") || "N/A"}</p>
-          
-          
+
+          <p className="movie-info">
+            ⭐ <span className="details-heading">Rating: </span>{" "}
+            {movie.vote_average}
+          </p>
+          <p className="movie-info">
+            📅 <span className="details-heading">Release Date: </span>
+            {movie.release_date}
+          </p>
+          <p className="movie-info">
+            <span className="details-heading">Movie Language: </span>{" "}
+            {movie.spoken_languages[0].name || "N/A"}
+          </p>
+          <p className="movie-info">
+            {" "}
+            <span className="details-heading"> Genres:</span>
+            {movie.genres?.map((g) => g.name).join(", ") || "N/A"}
+          </p>
+
           <button onClick={handleTrailer} className="trailer-btn">
             {Showtrailer ? "Close Trailer" : "Watch Trailer"}
           </button>
@@ -100,7 +113,12 @@ function SingleMovie() {
           {Showtrailer && trailerKey && (
             <div className="trailer-modal">
               <div className="trailer-content">
-                <button className="close-btn"  onClick={() => setShowTrailer(false)}> ✖
+                <button
+                  className="close-btn"
+                  onClick={() => setShowTrailer(false)}
+                >
+                  {" "}
+                  ✖
                 </button>
 
                 <iframe
