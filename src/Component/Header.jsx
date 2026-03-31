@@ -54,20 +54,38 @@ function Header() {
           <button className="search-btn">
             <TfiSearch />
           </button>
+
+          {suggestions.length > 0 && (
+            <div className="suggestions">
+              {suggestions.map((item) => (
+                <div
+                  key={item.id}
+                  className="suggestion-item"
+                  onClick={() => handleClick(item)}
+                >
+                  <div
+                    className="suggestion-item"
+                    onClick={() => handleClick(item)}
+                  >
+                    <img
+                      src={
+                        item.poster_path
+                          ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
+                          : "https://via.placeholder.com/50"
+                      }
+                      alt=""
+                    />
+
+                    <div>
+                      <p>{item.title || item.name}</p>
+                      <span>{item.media_type}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-        {suggestions.length > 0 && (
-          <div className="suggestions">
-            {suggestions.map((item) => (
-              <div
-                key={item.id}
-                className="suggestion-item"
-                onClick={() => handleClick(item)}
-              >
-                {item.title || item.name}
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
       <nav className="nav-links">
