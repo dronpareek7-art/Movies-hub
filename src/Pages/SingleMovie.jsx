@@ -1,27 +1,32 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import "./SingleMovie.css";
-import { BsBookmarkPlusFill } from "react-icons/bs";
 import { useContext } from "react";
 import { Moviecontext } from "../Component/Router";
+import { FaPlay } from "react-icons/fa";
+
 function SingleMovie() {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const [trailerKey, setTrailerkey] = useState(null);
   const [Showtrailer, setShowTrailer] = useState(false);
+  const location = useLocation();
+  const isTV = location.pathname.includes("/tv");
 
-  const { Addtowatchlist } = useContext(Moviecontext);
+  let { Addtowatchlist, Watchlist, removeFromWatchlist, isInWatchlist } =
+    useContext(Moviecontext);
 
   useEffect(() => {
     fetchMovie();
-  }, [id]);
+  }, [id, isTV]);
 
   async function fetchMovie() {
     const API_KEY = import.meta.env.VITE_API_KEY;
+    const type = isTV ? "tv" : "movie";
 
     try {
       const res = await fetch(
-        `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`,
+        `https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}`,
       );
       const data = await res.json();
       setMovie(data);
@@ -37,9 +42,10 @@ function SingleMovie() {
     }
 
     const API_KEY = import.meta.env.VITE_API_KEY;
+    const type = isTV ? "tv" : "movie";
 
     const res = await fetch(
-      `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}`,
+      `https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${API_KEY}`,
     );
 
     const data = await res.json();
@@ -50,7 +56,7 @@ function SingleMovie() {
 
     if (trailer) {
       setTrailerkey(trailer.key);
-      setShowTrailer(true); 
+      setShowTrailer(true);
       console.log(trailer);
     }
   }
@@ -70,11 +76,11 @@ function SingleMovie() {
         <img
           className="movie-poster"
           src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-          alt={movie.title}
+          alt={movie.title || movie.name}
         />
 
         <div className="movie-details">
-          <h1 className="movie-title">{movie.title}</h1>
+          <h1 className="movie-title">{movie.title || movie.name}</h1>
 
           <p className="movie-overview">
             <span className="details-heading">Description:</span>
@@ -87,7 +93,7 @@ function SingleMovie() {
           </p>
           <p className="movie-info">
             📅 <span className="details-heading">Release Date: </span>
-            {movie.release_date}
+            {movie.release_date || movie.first_air_date}
           </p>
           <p className="movie-info">
             <span className="details-heading">Movie Language: </span>{" "}
@@ -96,19 +102,25 @@ function SingleMovie() {
           <p className="movie-info">
             {" "}
             <span className="details-heading"> Genres:</span>
-            {movie.genres?.map((g) => g.name).join(", ") || "N/A"}
+            {movie.genres.map((g) => g.name).join(", ") || "N/A"}
           </p>
 
           <button onClick={handleTrailer} className="trailer-btn">
+            <FaPlay /> {""}
             {Showtrailer ? "Close Trailer" : "Watch Trailer"}
           </button>
           <button
             className="watchlist-btn"
-            onClick={() => Addtowatchlist(movie)}
+            onClick={() =>
+              isInWatchlist(movie.id)
+                ? removeFromWatchlist(movie.id)
+                : Addtowatchlist(movie)
+            }
           >
             {" "}
-            <BsBookmarkPlusFill size={16} />
-            Add To Watchlist
+            {isInWatchlist(movie.id)
+              ? `  Remove from watchlist`
+              : " Add to watchlist"}
           </button>
           {Showtrailer && trailerKey && (
             <div className="trailer-modal">

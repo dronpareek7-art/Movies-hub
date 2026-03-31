@@ -33,6 +33,12 @@
   width: 100%;
   height: 260px;
   object-fit: cover;
+  position: relative
+}
+.removeicon{
+  position: absolute;
+  top: 2%;
+  right: 3%;
 }
 
 .watchlist-content {

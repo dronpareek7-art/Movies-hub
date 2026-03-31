@@ -1,17 +1,19 @@
-import { useContext, useEffect, useState} from "react";
+import { useContext, useEffect, useState } from "react";
 import { baseImageUrl } from "./data";
 import "./Home.css";
-import { useNavigate } from "react-router-dom";
-import { BsBookmarkPlusFill } from "react-icons/bs";
+import { Link, useNavigate } from "react-router-dom";
+import { BsBookmarkPlusFill, BsBookmarkCheckFill } from "react-icons/bs";
 import { Moviecontext } from "./Component/Router";
 
 function Home({ urls, heading, btn1, btn2 }) {
   const [movieData, setMovieData] = useState([]);
   const [showData, setShowData] = useState(urls[0]);
   const [loading, setLoading] = useState(true);
-  let { Addtowatchlist } = useContext(Moviecontext);
+  let { Addtowatchlist, Watchlist, removeFromWatchlist, isInWatchlist } =
+    useContext(Moviecontext);
   const navigate = useNavigate();
-
+  const isTV = showData.includes("tv");
+  const isPerson = showData.includes("person")
   useEffect(() => {
     async function fetchMovies() {
       try {
@@ -57,28 +59,37 @@ function Home({ urls, heading, btn1, btn2 }) {
         </div>
       </header>
 
-     
-      <div className="movie-slider" >
+      <div className="movie-slider">
         {loading ? (
           <p>Loading....</p>
         ) : movieData.length > 0 ? (
           movieData.map((item) => (
             <div key={item.id} className="movie-card">
               <div className="poster-wrapper">
-                {item.poster_path && (
-                  <img
-                    src={`${baseImageUrl}${item.poster_path}`}
-                    alt={item.title || item.name}
-                    loading="lazy"
-                    onClick={() => navigate(`/movie/${item.id}`)}
-                  />
+                {(item.poster_path || item.profile_path) && (
+                  <Link to={
+                    isPerson ? `/person/${item.id}`:
+                    `/${isTV ? "tv" : "movie"}/${item.id}`}>
+                    <img
+                      src={`${baseImageUrl}${item.poster_path || item.profile_path}`}
+                      alt={item.title || item.name}
+                      loading="lazy"
+                    />
+                  </Link>
                 )}
                 <button
-                  onClick={() => Addtowatchlist(item)}
+                  onClick={() =>
+                    isInWatchlist(item.id)
+                      ? removeFromWatchlist(item.id)
+                      : Addtowatchlist(item)
+                  }
                   className="watchlist-icon"
                 >
-                  {" "}
-                  <BsBookmarkPlusFill />{" "}
+                  {isInWatchlist(item.id) ? (
+                    <BsBookmarkCheckFill />
+                  ) : (
+                    <BsBookmarkPlusFill />
+                  )}
                 </button>
               </div>
 
@@ -86,8 +97,8 @@ function Home({ urls, heading, btn1, btn2 }) {
                 <h3>{trimContent(item.title || item.name)}</h3>
 
                 <p>
-                  {item.release_date
-                    ? new Date(item.release_date).toLocaleDateString("en-US", {
+                  {item.release_date || item.first_air_date
+                    ? new Date(item.release_date  || item.first_air_date).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
                         day: "2-digit",
