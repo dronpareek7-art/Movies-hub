@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useLocation ,Link } from "react-router-dom";
+import { useParams, useLocation, Link } from "react-router-dom";
 import "./SingleMovie.css";
 import { useContext } from "react";
 import { Moviecontext } from "../Component/Router";
@@ -11,12 +11,21 @@ function SingleMovie() {
   const [movie, setMovie] = useState(null);
   const [trailerKey, setTrailerkey] = useState(null);
   const [Showtrailer, setShowTrailer] = useState(false);
-  const[cast,setCast] = useState([])
+  const [cast, setCast] = useState([]);
   const Location = useLocation();
   const isTV = Location.pathname.includes("/tv");
   let { Addtowatchlist, Watchlist, removeFromWatchlist, isInWatchlist } =
     useContext(Moviecontext);
-    const{ location, city, error, loading, getLocation} = LocationData()
+  const {
+    location,
+    city,
+    error,
+    loading,
+    getLocation,
+    getNearestTheatres,
+    theatres,
+    loadingTheatre,
+  } = LocationData();
 
   useEffect(() => {
     fetchMovie();
@@ -37,13 +46,11 @@ function SingleMovie() {
       console.log(err);
     }
     const creditRes = await fetch(
-     ` https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`,
+      ` https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`,
     );
     const creditData = await creditRes.json();
 
     setCast(creditData.cast || []);
-
-
   }
   async function handleTrailer() {
     if (Showtrailer) {
@@ -71,149 +78,163 @@ function SingleMovie() {
     }
   }
 
-if (!movie)
-  return (
-    <div className="single-movie">
-      <div className="movie-container">
-        <div className="skeleton poster"></div>
+  if (!movie)
+    return (
+      <div className="single-movie">
+        <div className="movie-container">
+          <div className="skeleton poster"></div>
 
-        <div className="movie-details">
-          <div className="skeleton title"></div>
-          <div className="skeleton text"></div>
-          <div className="skeleton text"></div>
-          <div className="skeleton text small"></div>
-          <div className="skeleton text small"></div>
-          <div className="skeleton btn"></div>
-          <div className="skeleton btn"></div>
+          <div className="movie-details">
+            <div className="skeleton title"></div>
+            <div className="skeleton text"></div>
+            <div className="skeleton text"></div>
+            <div className="skeleton text small"></div>
+            <div className="skeleton text small"></div>
+            <div className="skeleton btn"></div>
+            <div className="skeleton btn"></div>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
   return (
     <>
-   
-    <div
-      className="single-movie"
-      style={{
-        backgroundImage: movie.backdrop_path
-          ? `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`
-          : `url(https://image.tmdb.org/t/p/w500${movie.poster_path})`,
-      }}
-    >
-      <div className="movie-container">
-        <img
-          className="movie-poster"
-          src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-          alt={movie.title || movie.name}
-        />
+      <div
+        className="single-movie"
+        style={{
+          backgroundImage: movie.backdrop_path
+            ? `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`
+            : `url(https://image.tmdb.org/t/p/w500${movie.poster_path})`,
+        }}
+      >
+        <div className="movie-container">
+          <img
+            className="movie-poster"
+            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+            alt={movie.title || movie.name}
+          />
 
-        <div className="movie-details">
-          <h1 className="movie-title">{movie.title || movie.name}</h1>
+          <div className="movie-details">
+            <h1 className="movie-title">{movie.title || movie.name}</h1>
 
-          <p className="movie-overview">
-            <span className="details-heading">Description:</span>
-            {movie.overview}
-          </p>
+            <p className="movie-overview">
+              <span className="details-heading">Description:</span>
+              {movie.overview}
+            </p>
 
-          <p className="movie-info">
-            ⭐ <span className="details-heading">Rating: </span>{" "}
-            {movie.vote_average}
-          </p>
-          <p className="movie-info">
-            📅 <span className="details-heading">Release Date: </span>
-            {movie.release_date || movie.first_air_date}
-          </p>
-          <p className="movie-info">
-            <span className="details-heading">Movie Language: </span>{" "}
-            {movie.spoken_languages.map((s) => s.english_name).join(",") || "N/A"}
-          </p>
+            <p className="movie-info">
+              ⭐ <span className="details-heading">Rating: </span>{" "}
+              {movie.vote_average}
+            </p>
+            <p className="movie-info">
+              📅 <span className="details-heading">Release Date: </span>
+              {movie.release_date || movie.first_air_date}
+            </p>
+            <p className="movie-info">
+              <span className="details-heading">Movie Language: </span>{" "}
+              {movie.spoken_languages.map((s) => s.english_name).join(",") ||
+                "N/A"}
+            </p>
 
-          <p className="movie-info">
-            {" "}
-            <span className="details-heading"> Genres:</span>
-            {movie.genres.map((g) => g.name).join(", ") || "N/A"}
-          </p>
+            <p className="movie-info">
+              {" "}
+              <span className="details-heading"> Genres:</span>
+              {movie.genres.map((g) => g.name).join(", ") || "N/A"}
+            </p>
 
-          <button onClick={handleTrailer} className="trailer-btn">
-            <FaPlay /> {""}
-            {Showtrailer ? "Close Trailer" : "Watch Trailer"}
-          </button>
-          <button
-            className="watchlist-btn"
-            onClick={() =>
-              isInWatchlist(movie.id)
-                ? removeFromWatchlist(movie.id)
-                : Addtowatchlist(movie)
-            }
-          >
-            {" "}
-            {isInWatchlist(movie.id)
-              ? `  Remove from watchlist`
-              : " Add to watchlist"}
-          </button>
-          <div className="location-box">
-            <button onClick={getLocation} className="location-btn">
-              Get Nearest Theater Location
+            <button onClick={handleTrailer} className="trailer-btn">
+              <FaPlay /> {""}
+              {Showtrailer ? "Close Trailer" : "Watch Trailer"}
             </button>
+            <button
+              className="watchlist-btn"
+              onClick={() =>
+                isInWatchlist(movie.id)
+                  ? removeFromWatchlist(movie.id)
+                  : Addtowatchlist(movie)
+              }
+            >
+              {" "}
+              {isInWatchlist(movie.id)
+                ? `  Remove from watchlist`
+                : " Add to watchlist"}
+            </button>
+            <div className="location-box">
+              <button
+                className="location-btn"
+                onClick={async () => {
+                  await getLocation();
+                  setTimeout(() => {
+                    getNearestTheatres();
+                  }, 1000);
+                }}
+              >
+                Get Nearest Theater Location 
+              </button>
 
-            {loading && <p className="location-text">Loading...</p>}
-            {error && <p className="location-text">{error}</p>}
+              {loading && (
+                <p className="location-text"> Fetching your Location...</p>
+              )}
+              {error && <p className="location-text">{error}</p>}
 
-            {location && (
-              <p className="location-coords">
-                Lat: {location.lat}, Lng: {location.lng}
-              </p>
-            )}
-
-            {city && <p className="location-text">📍 {city}</p>}
-          </div>
-
-          {Showtrailer && trailerKey && (
-            <div className="trailer-modal">
-              <div className="trailer-content">
-                <button
-                  className="close-btn"
-                  onClick={() => setShowTrailer(false)}
-                >
-                  {" "}
-                  ✖
-                </button>
-
-                <iframe
-                 src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1`}
-                  title="Trailer"
-                  allowFullScreen
-                  
-                ></iframe>
-              </div>
+              {city && <p className="location-text">📍 {city}</p>}
+              {loadingTheatre ? (
+                <p className="location-text">Loading theatres... 🎬</p>
+              ) : (
+                <div className="theatre-list">
+                  {theatres.slice(0, 5).map((t, i) => (
+                    <div key={i} className="theatre-card">
+                      <h4>{t.name}</h4>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+
+            {Showtrailer && trailerKey && (
+              <div className="trailer-modal">
+                <div className="trailer-content">
+                  <button
+                    className="close-btn"
+                    onClick={() => setShowTrailer(false)}
+                  >
+                    {" "}
+                    ✖
+                  </button>
+
+                  <iframe
+                    src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1`}
+                    title="Trailer"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-    <div className="cast-wrapper">
-  <h2 className="cast-heading">Cast</h2>
+      <div className="cast-wrapper">
+        <h2 className="cast-heading">Cast</h2>
 
-  <div className="cast-container">
-    {cast.slice(0, 12).map((actor) => (
-      <Link to={`/person/${actor.id}`} key={actor.id}>
-        <div className="cast-card">
-          {actor.profile_path ? (
-            <img
-              src={`${baseImageUrl}${actor.profile_path}`}
-              alt={actor.name}
-            />
-          ) : (
-            <div className="no-image"></div>
-          )}
+        <div className="cast-container">
+          {cast.slice(0, 12).map((actor) => (
+            <Link to={`/person/${actor.id}`} key={actor.id}>
+              <div className="cast-card">
+                {actor.profile_path ? (
+                  <img
+                    src={`${baseImageUrl}${actor.profile_path}`}
+                    alt={actor.name}
+                  />
+                ) : (
+                  <div className="no-image"></div>
+                )}
 
-          <p>{actor.name}</p>
+                <p>{actor.name}</p>
+              </div>
+            </Link>
+          ))}
         </div>
-      </Link>
-    ))}
-  </div>
-</div>
- </>
+      </div>
+    </>
   );
 }
 

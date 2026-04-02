@@ -5,6 +5,8 @@ function LocationData() {
   const [city, setCity] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [theatres, setTheatres] = useState([]);
+const [loadingTheatre, setLoadingTheatre] = useState(false);
 
   const API_KEY = import.meta.env.VITE_OPENCAGE_API_KEY;
 
@@ -49,8 +51,51 @@ function LocationData() {
       },
     );
   }
+  async function getNearestTheatres() {
+  if (!location) {
+    return;
+  }
 
-  return { location, city, error, loading, getLocation };
+  setLoadingTheatre(true);
+
+  const query = `
+  [out:json];
+  (
+    node["amenity"="cinema"](around:5000,${location.lat},${location.lng});
+    way["amenity"="cinema"](around:5000,${location.lat},${location.lng});
+    relation["amenity"="cinema"](around:5000,${location.lat},${location.lng});
+  );
+  out center;
+  `;
+
+  try {
+    const res = await fetch("https://overpass-api.de/api/interpreter", {
+      method: "POST",
+      body: query,
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    });
+
+    const data = await res.json();
+
+    const cleaned = data.elements.map((el) => ({
+      name: el.tags?.name || "No Name",
+      lat: el.lat || el.center?.lat,
+      lng: el.lon || el.center?.lon,
+    }));
+
+    setTheatres(cleaned);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    setLoadingTheatre(false);
+  }
+}
+
+  return { location, city, error, loading, getLocation , getNearestTheatres,
+  theatres,
+  loadingTheatre,};
 }
 
 export default LocationData;
