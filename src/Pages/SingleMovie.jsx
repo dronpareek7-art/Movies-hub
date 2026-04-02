@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { Moviecontext } from "../Component/Router";
 import { FaPlay } from "react-icons/fa";
 import { baseImageUrl } from "../data";
+import LocationData from "./LocationData";
 function SingleMovie() {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
@@ -15,6 +16,7 @@ function SingleMovie() {
   const isTV = Location.pathname.includes("/tv");
   let { Addtowatchlist, Watchlist, removeFromWatchlist, isInWatchlist } =
     useContext(Moviecontext);
+    const{ location, city, error, loading, getLocation} = LocationData()
 
   useEffect(() => {
     fetchMovie();
@@ -149,6 +151,22 @@ if (!movie)
               ? `  Remove from watchlist`
               : " Add to watchlist"}
           </button>
+          <div className="location-box">
+            <button onClick={getLocation} className="location-btn">
+              Get Nearest Theater Location
+            </button>
+
+            {loading && <p className="location-text">Loading...</p>}
+            {error && <p className="location-text">{error}</p>}
+
+            {location && (
+              <p className="location-coords">
+                Lat: {location.lat}, Lng: {location.lng}
+              </p>
+            )}
+
+            {city && <p className="location-text">📍 {city}</p>}
+          </div>
 
           {Showtrailer && trailerKey && (
             <div className="trailer-modal">
@@ -162,9 +180,10 @@ if (!movie)
                 </button>
 
                 <iframe
-                  src={`https://www.youtube.com/embed/${trailerKey}`}
+                 src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1`}
                   title="Trailer"
                   allowFullScreen
+                  
                 ></iframe>
               </div>
             </div>

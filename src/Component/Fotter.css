@@ -55,7 +55,6 @@
   transform: translateX(4px);
 }
 
-/* SOCIAL ICONS */
 .socials {
   display: flex;
   gap: 15px;
@@ -73,8 +72,9 @@
   color: #f43f5e;
   transform: scale(1.2);
 }
-
-/* FOOTER BOTTOM */
+.socials a:hover {
+  color: #e1306c;
+}
 .footer-bottom {
   text-align: center;
   margin-top: 30px;
@@ -86,9 +86,6 @@
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* ================= RESPONSIVE ================= */
-
-/* Tablet */
 @media (max-width: 768px) {
   .footer-container {
     grid-template-columns: repeat(2, 1fr);
