@@ -13,13 +13,13 @@ function SinglePerson() {
       const API_KEY = import.meta.env.VITE_API_KEY;
 
       const res = await fetch(
-        `https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}`
+        `https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}`,
       );
       const data = await res.json();
       setPerson(data);
 
       const movieRes = await fetch(
-        `https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${API_KEY}`
+        `https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${API_KEY}`,
       );
       const movieData = await movieRes.json();
       setMovies(movieData.cast || []);
@@ -28,8 +28,36 @@ function SinglePerson() {
     fetchPerson();
   }, [id]);
 
-  if (!person) return <h2>Loading...</h2>;
+  if (!person)
+    return (
+      <div className="sp-container">
+        <div className="sp-header">
+          <div className="skeleton sp-image-skeleton"></div>
 
+          <div className="sp-details">
+            <div className="skeleton sp-title"></div>
+            <div className="skeleton sp-text"></div>
+            <div className="skeleton sp-text"></div>
+            <div className="skeleton sp-text"></div>
+            <div className="skeleton sp-text long"></div>
+            <div className="skeleton sp-text long"></div>
+          </div>
+        </div>
+
+        <div className="sp-movies-section">
+          <h2>Movies</h2>
+
+          <div className="sp-movies-grid">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="sp-movie-card">
+                <div className="skeleton sp-movie-img-skeleton"></div>
+                <div className="skeleton sp-movie-title-skeleton"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   return (
     <div className="sp-container">
       <div className="sp-header">
@@ -44,9 +72,16 @@ function SinglePerson() {
         <div className="sp-details">
           <h1>{person.name}</h1>
 
-          <p><b className="sp-detail">Known For:</b> {person.known_for_department}</p>
-          <p><b className="sp-detail">Birthday:</b> {person.birthday}</p>
-          <p><b className="sp-detail">Place of Birth:</b> {person.place_of_birth}</p>
+          <p>
+            <b className="sp-detail">Known For:</b>{" "}
+            {person.known_for_department}
+          </p>
+          <p>
+            <b className="sp-detail">Birthday:</b> {person.birthday}
+          </p>
+          <p>
+            <b className="sp-detail">Place of Birth:</b> {person.place_of_birth}
+          </p>
 
           <p>
             <b className="sp-detail">Biography:</b>{" "}

@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation ,Link } from "react-router-dom";
 import "./SingleMovie.css";
 import { useContext } from "react";
 import { Moviecontext } from "../Component/Router";
 import { FaPlay } from "react-icons/fa";
+import { baseImageUrl } from "../data";
 function SingleMovie() {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const [trailerKey, setTrailerkey] = useState(null);
   const [Showtrailer, setShowTrailer] = useState(false);
+  const[cast,setCast] = useState([])
   const Location = useLocation();
   const isTV = Location.pathname.includes("/tv");
   let { Addtowatchlist, Watchlist, removeFromWatchlist, isInWatchlist } =
@@ -32,6 +34,14 @@ function SingleMovie() {
     } catch (err) {
       console.log(err);
     }
+    const creditRes = await fetch(
+     ` https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`,
+    );
+    const creditData = await creditRes.json();
+
+    setCast(creditData.cast || []);
+
+
   }
   async function handleTrailer() {
     if (Showtrailer) {
@@ -59,9 +69,27 @@ function SingleMovie() {
     }
   }
 
-  if (!movie) return <h2 className="loading">Loading Movie... 🎬</h2>;
-
+if (!movie)
   return (
+    <div className="single-movie">
+      <div className="movie-container">
+        <div className="skeleton poster"></div>
+
+        <div className="movie-details">
+          <div className="skeleton title"></div>
+          <div className="skeleton text"></div>
+          <div className="skeleton text"></div>
+          <div className="skeleton text small"></div>
+          <div className="skeleton text small"></div>
+          <div className="skeleton btn"></div>
+          <div className="skeleton btn"></div>
+        </div>
+      </div>
+    </div>
+  );
+  return (
+    <>
+   
     <div
       className="single-movie"
       style={{
@@ -95,8 +123,9 @@ function SingleMovie() {
           </p>
           <p className="movie-info">
             <span className="details-heading">Movie Language: </span>{" "}
-            {movie.spoken_languages[0].name || "N/A"}
+            {movie.spoken_languages.map((s) => s.english_name).join(",") || "N/A"}
           </p>
+
           <p className="movie-info">
             {" "}
             <span className="details-heading"> Genres:</span>
@@ -143,6 +172,29 @@ function SingleMovie() {
         </div>
       </div>
     </div>
+    <div className="cast-wrapper">
+  <h2 className="cast-heading">Cast</h2>
+
+  <div className="cast-container">
+    {cast.slice(0, 12).map((actor) => (
+      <Link to={`/person/${actor.id}`} key={actor.id}>
+        <div className="cast-card">
+          {actor.profile_path ? (
+            <img
+              src={`${baseImageUrl}${actor.profile_path}`}
+              alt={actor.name}
+            />
+          ) : (
+            <div className="no-image"></div>
+          )}
+
+          <p>{actor.name}</p>
+        </div>
+      </Link>
+    ))}
+  </div>
+</div>
+ </>
   );
 }
 

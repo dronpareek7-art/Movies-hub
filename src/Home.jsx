@@ -13,7 +13,7 @@ function Home({ urls, heading, btn1, btn2 }) {
     useContext(Moviecontext);
   const navigate = useNavigate();
   const isTV = showData.includes("tv");
-  const isPerson = showData.includes("person")
+  const isPerson = showData.includes("person");
   useEffect(() => {
     async function fetchMovies() {
       try {
@@ -61,15 +61,32 @@ function Home({ urls, heading, btn1, btn2 }) {
 
       <div className="movie-slider">
         {loading ? (
-          <p>Loading....</p>
+          <div className="movie-slider">
+            {[...Array(10)].map((_, i) => (
+              <div key={i} className="movie-card">
+                <div className="poster-wrapper">
+                  <div className="skeleton home-poster"></div>
+                </div>
+
+                <div className="content">
+                  <div className="skeleton home-title"></div>
+                  <div className="skeleton home-date"></div>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : movieData.length > 0 ? (
           movieData.map((item) => (
             <div key={item.id} className="movie-card">
               <div className="poster-wrapper">
                 {(item.poster_path || item.profile_path) && (
-                  <Link to={
-                    isPerson ? `/person/${item.id}`:
-                    `/${isTV ? "tv" : "movie"}/${item.id}`}>
+                  <Link
+                    to={
+                      isPerson
+                        ? `/person/${item.id}`
+                        : `/${isTV ? "tv" : "movie"}/${item.id}`
+                    }
+                  >
                     <img
                       src={`${baseImageUrl}${item.poster_path || item.profile_path}`}
                       alt={item.title || item.name}
@@ -84,9 +101,10 @@ function Home({ urls, heading, btn1, btn2 }) {
                       : Addtowatchlist(item)
                   }
                   className="watchlist-icon"
+                  title="Add to watchlist"
                 >
                   {isInWatchlist(item.id) ? (
-                    <BsBookmarkCheckFill />
+                    <BsBookmarkCheckFill/>
                   ) : (
                     <BsBookmarkPlusFill />
                   )}
@@ -98,7 +116,9 @@ function Home({ urls, heading, btn1, btn2 }) {
 
                 <p>
                   {item.release_date || item.first_air_date
-                    ? new Date(item.release_date  || item.first_air_date).toLocaleDateString("en-US", {
+                    ? new Date(
+                        item.release_date || item.first_air_date,
+                      ).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
                         day: "2-digit",
