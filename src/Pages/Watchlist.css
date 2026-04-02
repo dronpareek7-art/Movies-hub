@@ -35,10 +35,30 @@
   object-fit: cover;
   position: relative
 }
-.removeicon{
+.removeicon {
   position: absolute;
-  top: 2%;
-  right: 3%;
+  top: 8px;
+  right: 8px;
+
+  font-size: 25px;
+  color: #fff;
+
+  background: rgba(0, 0, 0, 0.6); /* dark overlay */
+  backdrop-filter: blur(4px);
+
+  padding: 6px;
+  border-radius: 50%;
+
+  cursor: pointer;
+  z-index: 10;
+
+  transition: all 0.25s ease;
+}
+
+.removeicon:hover {
+  background: #f43f5e; /* red highlight */
+  color: white;
+  transform: scale(1.2);
 }
 
 .watchlist-content {

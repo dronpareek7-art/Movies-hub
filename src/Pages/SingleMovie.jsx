@@ -4,15 +4,15 @@ import "./SingleMovie.css";
 import { useContext } from "react";
 import { Moviecontext } from "../Component/Router";
 import { FaPlay } from "react-icons/fa";
-
+import useLocationData from "./UseLocationData";
 function SingleMovie() {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const [trailerKey, setTrailerkey] = useState(null);
   const [Showtrailer, setShowTrailer] = useState(false);
-  const location = useLocation();
-  const isTV = location.pathname.includes("/tv");
-
+  const { location, city, error, getLocation, loading } = useLocationData();
+  const Location = useLocation();
+  const isTV = Location.pathname.includes("/tv");
   let { Addtowatchlist, Watchlist, removeFromWatchlist, isInWatchlist } =
     useContext(Moviecontext);
 
@@ -122,6 +122,23 @@ function SingleMovie() {
               ? `  Remove from watchlist`
               : " Add to watchlist"}
           </button>
+          <div className="location-box">
+            <button onClick={getLocation} className="location-btn">
+              Get Location
+            </button>
+
+            {loading && <p className="location-text">Loading...</p>}
+            {error && <p className="location-text">{error}</p>}
+
+            {location && (
+              <p className="location-coords">
+                Lat: {location.lat}, Lng: {location.lng}
+              </p>
+            )}
+
+            {city && <p className="location-text">📍 {city}</p>}
+          </div>
+
           {Showtrailer && trailerKey && (
             <div className="trailer-modal">
               <div className="trailer-content">

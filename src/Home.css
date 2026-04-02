@@ -155,6 +155,7 @@ body {
 .watchlist-icon:hover {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   transform: scale(1.15);
+  
 }
 
 /* CONTENT */

@@ -8,7 +8,6 @@ import WatchList from "../Pages/Watchlist";
 import Footer from "./Fotter";
 import { createContext, useState } from "react";
 import SinglePerson from "../Pages/Singleperson";
-
 export const Moviecontext = createContext(null);
 
 function Router() {
