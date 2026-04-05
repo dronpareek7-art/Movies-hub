@@ -77,10 +77,18 @@ function SinglePerson() {
             {person.known_for_department}
           </p>
           <p>
-            <b className="sp-detail">Birthday:</b> {person.birthday}
+            <b className="sp-detail">Birthday:</b>{" "}
+            {person.birthday
+              ? new Date(person.birthday).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "2-digit",
+                })
+              : ""}
           </p>
           <p>
-            <b className="sp-detail">Place of Birth:</b> {person.place_of_birth}
+            <b className="sp-detail">Place of Birth: </b>
+            {person.place_of_birth}
           </p>
 
           <p>

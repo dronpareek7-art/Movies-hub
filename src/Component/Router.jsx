@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Login } from "../Pages/Login";
+import  Login  from "../Pages/Login";
 import Home from "../Home";
 import SingleMovie from "../Pages/SingleMovie";
 import { urls } from "../data";
@@ -8,7 +8,9 @@ import WatchList from "../Pages/Watchlist";
 import Footer from "./Fotter";
 import { createContext, useState } from "react";
 import SinglePerson from "../Pages/Singleperson";
+import NotFound from "../Pages/NotFound";
 export const Moviecontext = createContext(null);
+
 
 function Router() {
   const [Watchlist, setWatchlist] = useState([]);
@@ -78,6 +80,9 @@ function Router() {
           <Route path="/movie/:id" element={<SingleMovie />} />
           <Route path="/tv/:id" element={<SingleMovie />} />
           <Route path="/person/:id" element={<SinglePerson />} />
+          <Route path="*" element={<NotFound />}></Route>
+
+          
     
         </Routes>
         <Footer />

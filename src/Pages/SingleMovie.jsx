@@ -77,6 +77,14 @@ function SingleMovie() {
       console.log(trailer);
     }
   }
+  function handleBooking(movie, city) {
+    window.open(
+      `https://www.google.com/search?q=${encodeURIComponent(
+        movie + " showtimes " + city,
+      )}`,
+      "_blank",
+    );
+  }
 
   if (!movie)
     return (
@@ -140,6 +148,7 @@ function SingleMovie() {
               <span className="details-heading"> Genres:</span>
               {movie.genres.map((g) => g.name).join(", ") || "N/A"}
             </p>
+            <div className="btn-group">
 
             <button onClick={handleTrailer} className="trailer-btn">
               <FaPlay /> {""}
@@ -158,6 +167,8 @@ function SingleMovie() {
                 ? `  Remove from watchlist`
                 : " Add to watchlist"}
             </button>
+            </div>
+
             <div className="location-box">
               <button
                 className="location-btn"
@@ -168,7 +179,7 @@ function SingleMovie() {
                   }, 1000);
                 }}
               >
-                Get Nearest Theater Location 
+                Show Nearest Theater
               </button>
 
               {loading && (
@@ -182,7 +193,12 @@ function SingleMovie() {
               ) : (
                 <div className="theatre-list">
                   {theatres.slice(0, 5).map((t, i) => (
-                    <div key={i} className="theatre-card">
+                    <div
+                      className="theatre-card"
+                      onClick={() =>
+                        handleBooking(movie.title || movie.name, city)
+                      }
+                    >
                       <h4>{t.name}</h4>
                     </div>
                   ))}

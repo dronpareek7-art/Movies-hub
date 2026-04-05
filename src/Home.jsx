@@ -4,6 +4,7 @@ import "./Home.css";
 import { Link, useNavigate } from "react-router-dom";
 import { BsBookmarkPlusFill, BsBookmarkCheckFill } from "react-icons/bs";
 import { Moviecontext } from "./Component/Router";
+import { toast } from "react-toastify";
 
 function Home({ urls, heading, btn1, btn2 }) {
   const [movieData, setMovieData] = useState([]);
@@ -95,16 +96,22 @@ function Home({ urls, heading, btn1, btn2 }) {
                   </Link>
                 )}
                 <button
-                  onClick={() =>
-                    isInWatchlist(item.id)
-                      ? removeFromWatchlist(item.id)
-                      : Addtowatchlist(item)
-                  }
+                  onClick={() => {
+                    if (isInWatchlist(item.id)) {
+                      removeFromWatchlist(item.id);
+                      toast.info("Removed from Watchlist ❌");
+                    } else {
+                      Addtowatchlist(item);
+                      toast.success("Added to Watchlist ❤️",{
+                        toastId:item.id,
+                      });
+                    }
+                  }}
                   className="watchlist-icon"
                   title="Add to watchlist"
                 >
                   {isInWatchlist(item.id) ? (
-                    <BsBookmarkCheckFill/>
+                    <BsBookmarkCheckFill />
                   ) : (
                     <BsBookmarkPlusFill />
                   )}

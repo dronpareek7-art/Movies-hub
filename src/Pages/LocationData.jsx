@@ -61,9 +61,9 @@ const [loadingTheatre, setLoadingTheatre] = useState(false);
   const query = `
   [out:json];
   (
-    node["amenity"="cinema"](around:5000,${location.lat},${location.lng});
-    way["amenity"="cinema"](around:5000,${location.lat},${location.lng});
-    relation["amenity"="cinema"](around:5000,${location.lat},${location.lng});
+    node["amenity"="cinema"](around:3000,${location.lat},${location.lng});
+    way["amenity"="cinema"](around:3000,${location.lat},${location.lng});
+    relation["amenity"="cinema"](around:3000,${location.lat},${location.lng});
   );
   out center;
   `;

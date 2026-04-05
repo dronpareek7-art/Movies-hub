@@ -19,7 +19,10 @@ function Footer() {
             like never before.
           </p>
 
-         <b> <span>Made with &hearts; Drona Pareek </span></b>
+          <b>
+            {" "}
+            <span>Made with &hearts; Drona Pareek </span>
+          </b>
         </div>
 
         <div className="footer-section">
@@ -46,8 +49,12 @@ function Footer() {
             >
               <IoLogoInstagram />
             </a>
-            <FaFacebook />
-            <FaTwitter />
+            <a href="#">
+              <FaFacebook />
+            </a>
+            <a href="#">
+              <FaTwitter />
+            </a>
           </div>
         </div>
       </div>

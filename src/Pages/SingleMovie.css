@@ -20,8 +20,8 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(2, 6, 23, 0.75);
-  backdrop-filter: blur(10px);
+  /* background: rgba(2, 6, 23, 0.75); */
+  backdrop-filter: blur(3px);
   z-index: 1;
 }
 
@@ -30,10 +30,9 @@
   z-index: 2;
   display: flex;
   gap: 40px;
-  max-width: 1100px;
   width: 100%;
-  background: rgba(30, 41, 59, 0.65);
-  backdrop-filter: blur(15px);
+  background: rgba(57, 57, 103, 0.667);
+  backdrop-filter: blur(4px);
   padding: 30px;
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
@@ -45,7 +44,8 @@
 }
 
 .movie-poster {
-  width: 260px;
+  width: 270px;
+  height: 450px;
   border-radius: 15px;
   transition: 0.4s;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
@@ -151,6 +151,29 @@
   transform: scale(1.01);
   box-shadow: 0 5px 20px rgba(239, 68, 68, 0.6);
 }
+.trailer-btn,
+.watchlist-btn {
+  width: fit-content; /* 🔥 main fix */
+  min-width: 200px; /* optional for consistency */
+}
+.btn-group {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap; /* mobile safe */
+}
+.trailer-btn,
+.watchlist-btn,
+.location-btn {
+  padding: 12px 22px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
 
 .trailer-modal {
   position: fixed;
@@ -163,6 +186,9 @@
   justify-content: center;
   align-items: center;
   z-index: 999;
+}
+.location-box {
+  margin-top: 20px;
 }
 
 .trailer-content {
@@ -242,7 +268,6 @@
     height: 250px;
   }
 }
-
 @media (max-width: 480px) {
   .single-movie {
     padding: 20px 10px;
@@ -250,10 +275,9 @@
   }
 
   .movie-container {
-    flex-direction: column;
-    gap: 20px;
-    padding: 20px;
+    padding: 18px;
     border-radius: 14px;
+    gap: 20px;
   }
 
   .movie-poster {
@@ -262,34 +286,33 @@
 
   .movie-title {
     font-size: 22px;
-    text-align: center;
   }
 
   .movie-overview {
     font-size: 14px;
-    text-align: center;
   }
 
   .movie-info {
     font-size: 13px;
-    text-align: center;
+  }
+
+  .btn-group {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
   }
 
   .trailer-btn,
   .watchlist-btn {
     width: 100%;
-    font-size: 14px;
-    padding: 10px;
+  }
+
+  .location-btn {
+    width: 100%;
   }
 
   .trailer-content iframe {
     height: 200px;
-  }
-
-  .close-btn {
-    top: -10px;
-    right: 0;
-    padding: 6px 10px;
   }
 }
 
@@ -324,6 +347,9 @@
   .trailer-content iframe {
     height: 250px;
   }
+  .btn-group {
+    justify-content: center;
+  }
 }
 
 @media (max-width: 1024px) {
@@ -333,7 +359,8 @@
   }
 
   .movie-poster {
-    width: 220px;
+    width: 300px;
+    height: auto;
   }
 
   .movie-title {
@@ -397,12 +424,7 @@
 }
 
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    #1e293b 25%,
-    #334155 50%,
-    #1e293b 75%
-  );
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 10px;
@@ -444,7 +466,7 @@
 }
 
 .cast-wrapper {
-  padding: 30px 60px;
+  padding: 30px 10px 0 21px;
   background: linear-gradient(to bottom, #020617, #0f172a);
   color: white;
 }
@@ -467,7 +489,7 @@
   padding-bottom: 10px;
 }
 
-.cast-container a{
+.cast-container a {
   text-decoration: none;
 }
 .cast-container::-webkit-scrollbar {
@@ -476,14 +498,14 @@
 
 .cast-card {
   flex: 0 0 auto;
-  width: 150px;
+  width:170px;
   text-align: center;
   transition: all 0.3s ease;
 }
 
 .cast-card img {
   width: 100%;
-  height: 250px;
+  height: auto;
   object-fit: cover;
   border-radius: 12px;
   transition: all 0.3s ease;
@@ -512,23 +534,23 @@
 
 @media (max-width: 768px) {
   .cast-card {
-    width: 100px;
+    width: 150px;
   }
 
   .cast-card img,
   .no-image {
-    height: 140px;
+    height: auto;
   }
 }
 
 @media (max-width: 480px) {
   .cast-card {
-    width: 90px;
+    width: 115px;
   }
 
   .cast-card img,
   .no-image {
-    height: 120px;
+    height: auto;
   }
 
   .cast-heading {
@@ -541,6 +563,9 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+.theatre-list a {
+  text-decoration: none;
 }
 
 .theatre-card {
@@ -601,5 +626,18 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+@media (min-width: 1400px) {
+  .movie-container {
+    max-width: 1300px;
+  }
+
+  .movie-title {
+    font-size: 52px;
+  }
+
+  .movie-overview {
+    font-size: 18px;
   }
 }
