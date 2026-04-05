@@ -20,7 +20,7 @@ function Header() {
       const API_KEY = import.meta.env.VITE_API_KEY;
 
       const res = await fetch(
-        ` https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${query}`,
+        `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${query}`,
       );
 
       const data = await res.json();

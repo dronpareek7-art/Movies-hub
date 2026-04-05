@@ -186,19 +186,19 @@ body {
 }
 @media (max-width: 768px) {
   .home-header {
-    flex-direction: row; 
+    flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: nowrap; 
+    flex-wrap: nowrap;
   }
 
   .home-header h2 {
     font-size: 18px;
-    white-space: nowrap; /
+    white-space: nowrap;
   }
 
   .toggle-buttons {
-    flex-shrink: 0; 
+    flex-shrink: 0;
   }
 
   .toggle-buttons button {
@@ -258,9 +258,8 @@ body {
   .toggle-buttons {
     flex-shrink: 0;
   }
-  .toggle-buttons button{
-  font-size: 12px;
-
+  .toggle-buttons button {
+    font-size: 12px;
   }
 }
 

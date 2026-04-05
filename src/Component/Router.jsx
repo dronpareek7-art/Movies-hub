@@ -11,7 +11,6 @@ import SinglePerson from "../Pages/Singleperson";
 import NotFound from "../Pages/NotFound";
 export const Moviecontext = createContext(null);
 
-
 function Router() {
   const [Watchlist, setWatchlist] = useState([]);
 
