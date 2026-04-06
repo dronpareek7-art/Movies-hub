@@ -245,6 +245,7 @@ function SingleMovie() {
                 )}
 
                 <p>{actor.name}</p>
+                <p>as {actor.character}</p>
               </div>
             </Link>
           ))}

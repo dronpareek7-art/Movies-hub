@@ -1,7 +1,7 @@
 import React from "react";
 import "./Login.css";
 import { RiMovie2AiFill } from "react-icons/ri";
-
+import { Link } from "react-router-dom";
 
 const Login = () => {
   return (
@@ -20,7 +20,7 @@ const Login = () => {
         </form>
 
         <p className="signup-text">
-          Don’t have an account? <span>Sign Up</span>
+          Don’t have an account? <Link to={"/signup"} className="link">Sign Up</Link>
         </p>
       </div>
     </div>

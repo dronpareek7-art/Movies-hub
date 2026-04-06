@@ -12,6 +12,7 @@ import NotFound from "../Pages/NotFound";
 export const Moviecontext = createContext(null);
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Signup from "../Pages/Signup";
 
 function Router() {
   const [Watchlist, setWatchlist] = useState([]);
@@ -86,6 +87,7 @@ function Router() {
           <Route path="/movie/:id" element={<SingleMovie />} />
           <Route path="/tv/:id" element={<SingleMovie />} />
           <Route path="/person/:id" element={<SinglePerson />} />
+         < Route path="/signup" element={<Signup/>} />
           <Route path="*" element={<NotFound />}></Route>
         </Routes>
         <Footer />
