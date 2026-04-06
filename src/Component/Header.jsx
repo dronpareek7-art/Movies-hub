@@ -4,12 +4,14 @@ import { RiMovie2AiFill } from "react-icons/ri";
 import { BsBookmarkPlusFill } from "react-icons/bs";
 import { TfiSearch } from "react-icons/tfi";
 import { useState, useEffect } from "react";
+import { useContext } from "react";
+import { Moviecontext } from "./Router";
 
 function Header() {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const navigate = useNavigate();
-
+  const { handleLogout, user } = useContext(Moviecontext);
   useEffect(() => {
     if (query.length < 2) {
       setSuggestions([]);
@@ -97,9 +99,11 @@ function Header() {
           Watchlist <BsBookmarkPlusFill size={16} />
         </Link>
 
-        <Link to="/Login" className="login">
-          Login
-        </Link>
+        {user ? (
+          <button onClick={handleLogout}>Logout</button>
+        ) : (
+          <Link to="/login">Login</Link>
+        )}
       </nav>
     </header>
   );

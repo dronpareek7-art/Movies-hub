@@ -149,34 +149,31 @@ function SingleMovie() {
               {movie.genres.map((g) => g.name).join(", ") || "N/A"}
             </p>
             <div className="btn-group">
-
-            <button onClick={handleTrailer} className="trailer-btn">
-              <FaPlay /> {""}
-              {Showtrailer ? "Close Trailer" : "Watch Trailer"}
-            </button>
-            <button
-              className="watchlist-btn"
-              onClick={() =>
-                isInWatchlist(movie.id)
-                  ? removeFromWatchlist(movie.id)
-                  : Addtowatchlist(movie)
-              }
-            >
-              {" "}
-              {isInWatchlist(movie.id)
-                ? `  Remove from watchlist`
-                : " Add to watchlist"}
-            </button>
+              <button onClick={handleTrailer} className="trailer-btn">
+                <FaPlay /> {""}
+                {Showtrailer ? "Close Trailer" : "Watch Trailer"}
+              </button>
+              <button
+                className="watchlist-btn"
+                onClick={() =>
+                  isInWatchlist(movie.id)
+                    ? removeFromWatchlist(movie.id)
+                    : Addtowatchlist(movie)
+                }
+              >
+                {" "}
+                {isInWatchlist(movie.id)
+                  ? `  Remove from watchlist`
+                  : " Add to watchlist"}
+              </button>
             </div>
 
             <div className="location-box">
               <button
                 className="location-btn"
                 onClick={async () => {
-                  await getLocation();
-                  setTimeout(() => {
-                    getNearestTheatres();
-                  }, 1000);
+                  const coords = await getLocation();
+                  await getNearestTheatres(coords);
                 }}
               >
                 Show Nearest Theater

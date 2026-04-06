@@ -6,16 +6,25 @@ import { urls } from "../data";
 import Header from "./Header";
 import WatchList from "../Pages/Watchlist";
 import Footer from "./Fotter";
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import SinglePerson from "../Pages/Singleperson";
 import NotFound from "../Pages/NotFound";
 export const Moviecontext = createContext(null);
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Signup from "../Pages/Signup";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 function Router() {
   const [Watchlist, setWatchlist] = useState([]);
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+    });
+    return () => unsub();
+  }, []);
 
   function Addtowatchlist(movieToAdd) {
     const exists = Watchlist.find((item) => item.id === movieToAdd.id);
@@ -29,6 +38,15 @@ function Router() {
   const isInWatchlist = (id) => {
     return Watchlist.some((item) => item.id === id);
   };
+  function handleLogout() {
+    signOut(auth)
+      .then(() => {
+        alert("Logged out ✅");
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  }
 
   return (
     <BrowserRouter>
@@ -39,6 +57,8 @@ function Router() {
           Addtowatchlist,
           removeFromWatchlist,
           isInWatchlist,
+          handleLogout,
+          user,
         }}
       >
         <Header />
@@ -87,7 +107,6 @@ function Router() {
           <Route path="/movie/:id" element={<SingleMovie />} />
           <Route path="/tv/:id" element={<SingleMovie />} />
           <Route path="/person/:id" element={<SinglePerson />} />
-         < Route path="/signup" element={<Signup/>} />
           <Route path="*" element={<NotFound />}></Route>
         </Routes>
         <Footer />
