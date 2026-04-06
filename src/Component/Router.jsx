@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import  Login  from "../Pages/Login";
+import Login from "../Pages/Login";
 import Home from "../Home";
 import SingleMovie from "../Pages/SingleMovie";
 import { urls } from "../data";
@@ -10,6 +10,8 @@ import { createContext, useState } from "react";
 import SinglePerson from "../Pages/Singleperson";
 import NotFound from "../Pages/NotFound";
 export const Moviecontext = createContext(null);
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Router() {
   const [Watchlist, setWatchlist] = useState([]);
@@ -23,14 +25,20 @@ function Router() {
   function removeFromWatchlist(id) {
     setWatchlist((prev) => prev.filter((item) => item.id !== id));
   }
-    const isInWatchlist = (id) => {
+  const isInWatchlist = (id) => {
     return Watchlist.some((item) => item.id === id);
   };
 
   return (
     <BrowserRouter>
       <Moviecontext.Provider
-        value={{ Watchlist, setWatchlist, Addtowatchlist, removeFromWatchlist ,isInWatchlist }}
+        value={{
+          Watchlist,
+          setWatchlist,
+          Addtowatchlist,
+          removeFromWatchlist,
+          isInWatchlist,
+        }}
       >
         <Header />
         <Routes>
@@ -75,16 +83,18 @@ function Router() {
           />
           <Route path="/Login" element={<Login />}></Route>
           <Route path="/Watchlist" element={<WatchList />}></Route>
-
           <Route path="/movie/:id" element={<SingleMovie />} />
           <Route path="/tv/:id" element={<SingleMovie />} />
           <Route path="/person/:id" element={<SinglePerson />} />
           <Route path="*" element={<NotFound />}></Route>
-
-          
-    
         </Routes>
         <Footer />
+        <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          theme="dark"
+          closeButton={true}
+        />{" "}
       </Moviecontext.Provider>
     </BrowserRouter>
   );

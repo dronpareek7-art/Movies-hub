@@ -6,7 +6,7 @@ function LocationData() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [theatres, setTheatres] = useState([]);
-const [loadingTheatre, setLoadingTheatre] = useState(false);
+  const [loadingTheatre, setLoadingTheatre] = useState(false);
 
   const API_KEY = import.meta.env.VITE_OPENCAGE_API_KEY;
 
@@ -52,13 +52,13 @@ const [loadingTheatre, setLoadingTheatre] = useState(false);
     );
   }
   async function getNearestTheatres() {
-  if (!location) {
-    return;
-  }
+    if (!location) {
+      return;
+    }
 
-  setLoadingTheatre(true);
+    setLoadingTheatre(true);
 
-  const query = `
+    const query = `
   [out:json];
   (
     node["amenity"="cinema"](around:3000,${location.lat},${location.lng});
@@ -68,34 +68,41 @@ const [loadingTheatre, setLoadingTheatre] = useState(false);
   out center;
   `;
 
-  try {
-    const res = await fetch("https://overpass-api.de/api/interpreter", {
-      method: "POST",
-      body: query,
-      headers: {
-        "Content-Type": "text/plain",
-      },
-    });
+    try {
+      const res = await fetch("https://overpass-api.de/api/interpreter", {
+        method: "POST",
+        body: query,
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    const cleaned = data.elements.map((el) => ({
-      name: el.tags?.name || "No Name",
-      lat: el.lat || el.center?.lat,
-      lng: el.lon || el.center?.lon,
-    }));
+      const cleaned = data.elements.map((el) => ({
+        name: el.tags?.name || "No Name",
+        lat: el.lat || el.center?.lat,
+        lng: el.lon || el.center?.lon,
+      }));
 
-    setTheatres(cleaned);
-  } catch (err) {
-    console.log(err);
-  } finally {
-    setLoadingTheatre(false);
+      setTheatres(cleaned);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoadingTheatre(false);
+    }
   }
-}
 
-  return { location, city, error, loading, getLocation , getNearestTheatres,
-  theatres,
-  loadingTheatre,};
+  return {
+    location,
+    city,
+    error,
+    loading,
+    getLocation,
+    getNearestTheatres,
+    theatres,
+    loadingTheatre,
+  };
 }
 
 export default LocationData;

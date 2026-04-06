@@ -77,7 +77,28 @@
   text-align: center;
   color: #e2e8f0;
 }
+.load-more {
+  margin: 2rem auto 0;
+  display: block;
+  padding: 0.8rem 1.6rem;
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  border: none;
+  border-radius: 999px;
+  color: #020617;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
 
+.load-more:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(56, 189, 248, 0.4);
+}
+
+.load-more:active {
+  transform: scale(0.96);
+}
 @media (max-width: 768px) {
   .sp-header {
     flex-direction: column;

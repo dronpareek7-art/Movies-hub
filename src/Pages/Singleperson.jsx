@@ -7,6 +7,7 @@ function SinglePerson() {
   const { id } = useParams();
   const [person, setPerson] = useState(null);
   const [movies, setMovies] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(12);
 
   useEffect(() => {
     async function fetchPerson() {
@@ -107,7 +108,7 @@ function SinglePerson() {
           {movies.length > 0 ? (
             movies
               .sort((a, b) => b.popularity - a.popularity)
-              .slice(0, 10)
+              .slice(0, visibleCount)
               .map((movie) => (
                 <div key={movie.id} className="sp-movie-card">
                   {movie.poster_path && (
@@ -126,6 +127,14 @@ function SinglePerson() {
             <p>No movies found</p>
           )}
         </div>
+        {visibleCount < movies.length && (
+          <button
+            className="load-more"
+            onClick={() => setVisibleCount((prev) => prev + 12)}
+          >
+            Load More
+          </button>
+        )}
       </div>
     </div>
   );

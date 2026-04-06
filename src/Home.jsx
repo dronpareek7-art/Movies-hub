@@ -10,7 +10,7 @@ function Home({ urls, heading, btn1, btn2 }) {
   const [movieData, setMovieData] = useState([]);
   const [showData, setShowData] = useState(urls[0]);
   const [loading, setLoading] = useState(true);
-  let { Addtowatchlist, Watchlist, removeFromWatchlist, isInWatchlist } =
+  let { Addtowatchlist, removeFromWatchlist, isInWatchlist } =
     useContext(Moviecontext);
   const navigate = useNavigate();
   const isTV = showData.includes("tv");
@@ -99,11 +99,11 @@ function Home({ urls, heading, btn1, btn2 }) {
                   onClick={() => {
                     if (isInWatchlist(item.id)) {
                       removeFromWatchlist(item.id);
-                      toast.info("Removed from Watchlist ❌");
+                      toast.error("Removed from Watchlist ❌");
                     } else {
                       Addtowatchlist(item);
-                      toast.success("Added to Watchlist ❤️",{
-                        toastId:item.id,
+                      toast.success("Added to Watchlist ❤️", {
+                        toastId: item.id,
                       });
                     }
                   }}

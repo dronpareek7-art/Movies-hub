@@ -4,7 +4,7 @@ import { Moviecontext } from "../Component/Router";
 import { Link } from "react-router-dom";
 import "./Watchlist.css";
 import { TbCancel } from "react-icons/tb";
-
+import { toast } from "react-toastify";
 const WatchList = () => {
   const { Watchlist, removeFromWatchlist } = useContext(Moviecontext);
 
@@ -57,7 +57,10 @@ const WatchList = () => {
                   </p>
 
                   <TbCancel
-                    onClick={() => removeFromWatchlist(item.id)}
+                    onClick={() => {
+                      removeFromWatchlist(item.id);
+                      toast.error("Removed from watchlist");
+                    }}  
                     className="removeicon"
                   />
                 </div>
