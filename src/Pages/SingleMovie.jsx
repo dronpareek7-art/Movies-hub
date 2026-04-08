@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useLocation, Link } from "react-router-dom";
+import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
 import "./SingleMovie.css";
 import { useContext } from "react";
 import { Moviecontext } from "../Component/Router";
@@ -7,6 +7,7 @@ import { FaPlay } from "react-icons/fa";
 import { baseImageUrl } from "../data";
 import LocationData from "./LocationData";
 import { BsBookmarkPlusFill, BsBookmarkCheckFill } from "react-icons/bs";
+import { toast } from "react-toastify";
 
 function SingleMovie() {
   const { id } = useParams();
@@ -16,8 +17,9 @@ function SingleMovie() {
   const [cast, setCast] = useState([]);
   const Location = useLocation();
   const isTV = Location.pathname.includes("/tv");
-  let { Addtowatchlist, Watchlist, removeFromWatchlist, isInWatchlist } =
+  let { Addtowatchlist, Watchlist, removeFromWatchlist, isInWatchlist, user } =
     useContext(Moviecontext);
+  const navigate = useNavigate();
   const {
     location,
     city,
@@ -205,11 +207,16 @@ function SingleMovie() {
               </button>
               <button
                 className="watchlist-btn"
-                onClick={() =>
+                onClick={() => {
+                  if (!user) {
+                    toast.info("Login required first");
+                    navigate("/login");
+                    return;
+                  }
                   isInWatchlist(movie.id)
                     ? removeFromWatchlist(movie.id)
-                    : Addtowatchlist(movie)
-                }
+                    : Addtowatchlist(movie);
+                }}
               >
                 {" "}
                 {isInWatchlist(movie.id) ? (
@@ -247,16 +254,23 @@ function SingleMovie() {
                 <p className="location-text">Loading theatres... 🎬</p>
               ) : (
                 <div className="theatre-list">
-                  {theatres.slice(0, 5).map((t, i) => (
-                    <div
-                      className="theatre-card"
-                      onClick={() =>
-                        handleBooking(movie.title || movie.name, city)
-                      }
-                    >
-                      <h4>{t.name}</h4>
-                    </div>
-                  ))}
+                  {theatres.length === 0 ? (
+                    <p className="location-text">
+                      {/* {city || "your area"}. */}
+                    </p>
+                  ) : (
+                    theatres.map((t, i) => (
+                      <div
+                        key={`${t.lat}-${t.lng}-${i}`}
+                        className="theatre-card"
+                        onClick={() =>
+                          handleBooking(movie.title || movie.name, city)
+                        }
+                      >
+                        <h4>{t.name}</h4>
+                      </div>
+                    ))
+                  )}
                 </div>
               )}
             </div>

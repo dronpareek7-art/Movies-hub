@@ -204,7 +204,7 @@
   width: 100%;
 }
 
-.login {
+.login-btn {
   padding: 8px 18px;
   border-radius: 20px;
 
@@ -215,15 +215,19 @@
   box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
 
   transition: 0.3s;
+  border: none;
+  cursor: pointer;
 }
 
-.login::after {
+.login-btn::after {
   display: none;
 }
-
-.login:hover {
+.login-btn:hover {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 18px rgba(244, 63, 94, 0.6);
+
+  box-shadow:
+    0 8px 20px rgba(244, 63, 94, 0.6),
+    0 0 10px rgba(244, 63, 94, 0.4);
 }
 
 @keyframes fadeIn {

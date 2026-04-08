@@ -63,7 +63,7 @@ function Router() {
         }}
       >
         <Header />
-        <ScrollToTop/>
+        <ScrollToTop />
         <Routes>
           <Route
             path="/"

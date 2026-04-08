@@ -10,7 +10,7 @@ function Home({ urls, heading, btn1, btn2 }) {
   const [movieData, setMovieData] = useState([]);
   const [showData, setShowData] = useState(urls[0]);
   const [loading, setLoading] = useState(true);
-  let { Addtowatchlist, removeFromWatchlist, isInWatchlist } =
+  let { Addtowatchlist, removeFromWatchlist, isInWatchlist, user } =
     useContext(Moviecontext);
   const navigate = useNavigate();
   const isTV = showData.includes("tv");
@@ -81,7 +81,7 @@ function Home({ urls, heading, btn1, btn2 }) {
           movieData.map((item) => (
             <div
               key={item.id}
-              className={item.profile_path ? "celeb-card" : "movie-card"}
+              className="movie-card"
             >
               <div className="poster-wrapper">
                 {(item.poster_path || item.profile_path) && (
@@ -101,6 +101,11 @@ function Home({ urls, heading, btn1, btn2 }) {
                 )}
                 <button
                   onClick={() => {
+                    if (!user) {
+                      toast.warning("please Login first");
+                      navigate("/login");
+                      return;
+                    }
                     if (isInWatchlist(item.id)) {
                       removeFromWatchlist(item.id);
                       toast.error("Removed from Watchlist ❌");

@@ -3,11 +3,12 @@ import "./Header.css";
 import { RiMovie2AiFill } from "react-icons/ri";
 import { BsBookmarkPlusFill } from "react-icons/bs";
 import { TfiSearch } from "react-icons/tfi";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useContext } from "react";
 import { Moviecontext } from "./Router";
 
 function Header() {
+  const searchRef = useRef(null)
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const navigate = useNavigate();
@@ -37,6 +38,21 @@ function Header() {
     return () => clearTimeout(delay);
   }, [query]);
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setSuggestions([]);
+        setActiveIndex(-1);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   function handleClick(item) {
     const type = item.media_type;
     navigate(`/${type}/${item.id}`);
@@ -49,7 +65,7 @@ function Header() {
         <RiMovie2AiFill /> Movie-Hub
       </Link>
 
-      <div className="search-bar">
+      <div className="search-bar" ref={searchRef}>
         <div className="search-wrapper">
           <input
             type="text"
@@ -95,13 +111,13 @@ function Header() {
 
       <nav className="nav-links">
         <Link to="/Watchlist">
-          Watchlist <BsBookmarkPlusFill size={16} />({Watchlist.length})
+          Watchlist ({Watchlist.length})<BsBookmarkPlusFill size={16} />
         </Link>
 
         {user ? (
-          <button onClick={handleLogout}>Logout</button>
+          <button onClick={handleLogout} className="login-btn">Log out</button>
         ) : (
-          <Link to="/login">Login</Link>
+          <Link to="/login" className="login-btn">Login</Link>
         )}
       </nav>
     </header>

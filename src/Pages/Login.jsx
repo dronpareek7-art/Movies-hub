@@ -5,16 +5,24 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { sendPasswordResetEmail } from "firebase/auth";
 const Login = () => {
   const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate()
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
   async function handleSignup(email, password) {
+    if (password !== confirmPassword) {
+      alert("Passwords do not match ❌");
+      return;
+    }
+
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      alert("Signup successful ✅");
-      navigate("/")
+      toast.info("Signup successful ✅");
+      navigate("/");
     } catch (err) {
       alert(err.message);
     }
@@ -22,10 +30,23 @@ const Login = () => {
 
   async function handleLogin(email, password) {
     try {
-      await  signInWithEmailAndPassword(auth, email, password);
-    
-      alert("Login successful ✅");
-      navigate("/")
+      await signInWithEmailAndPassword(auth, email, password);
+
+      toast.info("Login successful ✅");
+      navigate("/");
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+  async function handleForgotPassword() {
+    if (!email) {
+      alert("Please enter your email first ❗");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert("Password reset email sent 📩");
     } catch (err) {
       alert(err.message);
     }
@@ -52,22 +73,47 @@ const Login = () => {
             }
           }}
         >
-          {isSignup && <input type="text" placeholder="Enter Name" />}
+          {isSignup && <input type="text" placeholder="Enter Name" required />}
 
           <input
+            required
             type="email"
             placeholder="Enter Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <input
+            required
             type="password"
             placeholder="Enter Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          {isSignup && <input type="password" placeholder="Confirm Password" />}
+          {isSignup && (
+            <input
+              required
+              type="password"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          )}
+
+          {!isSignup && (
+            <p
+              style={{
+                color: "#facc15",
+                cursor: "pointer",
+                fontSize: "14px",
+                marginTop: "5px",
+                textAlign: "right",
+              }}
+              onClick={handleForgotPassword}
+            >
+              Forgot Password?
+            </p>
+          )}
 
           <button type="submit">{isSignup ? "Sign Up" : "Login"}</button>
         </form>
@@ -81,7 +127,6 @@ const Login = () => {
       </div>
     </div>
   );
-  
 };
 
 export default Login;
