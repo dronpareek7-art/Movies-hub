@@ -15,7 +15,7 @@ const WatchList = () => {
 
   return (
     <div className="watchlist-section">
-      <h2 className="watchlist-heading">Your WatchList</h2>
+      <h2 className="watchlist-heading">Your WatchList ({Watchlist.length})</h2>
 
       <div className="watchlist-grid">
         {Watchlist.length > 0 ? (
@@ -60,7 +60,7 @@ const WatchList = () => {
                     onClick={() => {
                       removeFromWatchlist(item.id);
                       toast.error("Removed from watchlist");
-                    }}  
+                    }}
                     className="removeicon"
                   />
                 </div>

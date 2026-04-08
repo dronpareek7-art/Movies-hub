@@ -15,6 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import ScrollToTop from "./ScrollToTop";
 
 function Router() {
   const [Watchlist, setWatchlist] = useState([]);
@@ -62,6 +63,7 @@ function Router() {
         }}
       >
         <Header />
+        <ScrollToTop/>
         <Routes>
           <Route
             path="/"
@@ -84,7 +86,7 @@ function Router() {
                   heading="Popular Actors"
                   btn1="Movies"
                   btn2="TV Shows"
-                  urls={[urls.popularcast, urls.popularcast]}
+                  urls={[urls.popularcast]}
                 />
 
                 <Home
@@ -112,9 +114,10 @@ function Router() {
         <Footer />
         <ToastContainer
           position="top-right"
-          autoClose={2000}
+          autoClose={1000}
           theme="dark"
           closeButton={true}
+          pauseOnHover={false}
         />{" "}
       </Moviecontext.Provider>
     </BrowserRouter>

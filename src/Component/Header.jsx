@@ -11,7 +11,11 @@ function Header() {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const navigate = useNavigate();
-  const { handleLogout, user } = useContext(Moviecontext);
+  const { handleLogout, user, Watchlist } = useContext(Moviecontext);
+  const dummyPerson = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+  const dummyPoster = "https://via.placeholder.com/92x138?text=No+Image";
+
   useEffect(() => {
     if (query.length < 2) {
       setSuggestions([]);
@@ -65,27 +69,22 @@ function Header() {
                   className="suggestion-item"
                   onClick={() => handleClick(item)}
                 >
-                  <div
-                    className="suggestion-item"
-                    onClick={() => handleClick(item)}
-                  >
-                    <img
-                      src={
-                        item.media_type === "person"
-                          ? item.profile_path
-                            ? `https://image.tmdb.org/t/p/w92${item.profile_path}`
-                            : "https://via.placeholder.com/50"
-                          : item.poster_path
-                            ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
-                            : "https://via.placeholder.com/50"
-                      }
-                      alt=""
-                    />
+                  <img
+                    src={
+                      item.media_type === "person"
+                        ? item.profile_path
+                          ? `https://image.tmdb.org/t/p/w92${item.profile_path}`
+                          : dummyPerson
+                        : item.poster_path
+                          ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
+                          : dummyPoster
+                    }
+                    alt={item.title || item.name}
+                  />
 
-                    <div>
-                      <p>{item.title || item.name}</p>
-                      <span>{item.media_type}</span>
-                    </div>
+                  <div>
+                    <p>{item.title || item.name}</p>
+                    <span>{item.media_type}</span>
                   </div>
                 </div>
               ))}
@@ -96,7 +95,7 @@ function Header() {
 
       <nav className="nav-links">
         <Link to="/Watchlist">
-          Watchlist <BsBookmarkPlusFill size={16} />
+          Watchlist <BsBookmarkPlusFill size={16} />({Watchlist.length})
         </Link>
 
         {user ? (

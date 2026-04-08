@@ -34,9 +34,9 @@ function Footer() {
 
         <div className="footer-section">
           <h3>Categories</h3>
-          <Link to="#">Trending</Link>
-          <Link to="#">Top Rated</Link>
-          <Link to="#">Upcoming</Link>
+          <Link to="/">Trending</Link>
+          <Link to="/">Top Rated</Link>
+          <Link to="/">Upcoming</Link>
         </div>
 
         <div className="footer-section">

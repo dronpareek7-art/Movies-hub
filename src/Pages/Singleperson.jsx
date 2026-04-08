@@ -8,22 +8,32 @@ function SinglePerson() {
   const [person, setPerson] = useState(null);
   const [movies, setMovies] = useState([]);
   const [visibleCount, setVisibleCount] = useState(12);
+  const [loadingMovies, setLoadingMovies] = useState(true);
 
   useEffect(() => {
     async function fetchPerson() {
       const API_KEY = import.meta.env.VITE_API_KEY;
 
-      const res = await fetch(
-        `https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}`,
-      );
-      const data = await res.json();
-      setPerson(data);
+      try {
+        const res = await fetch(
+          `https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}`,
+        );
+        const data = await res.json();
+        setPerson(data);
 
-      const movieRes = await fetch(
-        `https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${API_KEY}`,
-      );
-      const movieData = await movieRes.json();
-      setMovies(movieData.cast || []);
+        setLoadingMovies(true);
+
+        const movieRes = await fetch(
+          `https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${API_KEY}`,
+        );
+        const movieData = await movieRes.json();
+
+        setMovies(movieData.cast || []);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoadingMovies(false);
+      }
     }
 
     fetchPerson();
@@ -105,7 +115,14 @@ function SinglePerson() {
         <h2>Movies</h2>
 
         <div className="sp-movies-grid">
-          {movies.length > 0 ? (
+          {loadingMovies ? (
+            [...Array(8)].map((_, i) => (
+              <div key={i} className="sp-movie-card">
+                <div className="skeleton sp-movie-img-skeleton"></div>
+                <div className="skeleton sp-movie-title-skeleton"></div>
+              </div>
+            ))
+          ) : movies.length > 0 ? (
             movies
               .sort((a, b) => b.popularity - a.popularity)
               .slice(0, visibleCount)

@@ -42,22 +42,23 @@ function Home({ urls, heading, btn1, btn2 }) {
     <section className="home-section">
       <header className="home-header">
         <h2>{heading}</h2>
+        {!isPerson && (
+          <div className="toggle-buttons">
+            <button
+              className={showData === urls[0] ? "active-btn" : ""}
+              onClick={() => setShowData(urls[0])}
+            >
+              {btn1}
+            </button>
 
-        <div className="toggle-buttons">
-          <button
-            className={showData === urls[0] ? "active-btn" : ""}
-            onClick={() => setShowData(urls[0])}
-          >
-            {btn1}
-          </button>
-
-          <button
-            className={showData === urls[1] ? "active-btn" : ""}
-            onClick={() => setShowData(urls[1])}
-          >
-            {btn2}
-          </button>
-        </div>
+            <button
+              className={showData === urls[1] ? "active-btn" : ""}
+              onClick={() => setShowData(urls[1])}
+            >
+              {btn2}
+            </button>
+          </div>
+        )}
       </header>
 
       <div className="movie-slider">
@@ -78,7 +79,10 @@ function Home({ urls, heading, btn1, btn2 }) {
           </div>
         ) : movieData.length > 0 ? (
           movieData.map((item) => (
-            <div key={item.id} className="movie-card">
+            <div
+              key={item.id}
+              className={item.profile_path ? "celeb-card" : "movie-card"}
+            >
               <div className="poster-wrapper">
                 {(item.poster_path || item.profile_path) && (
                   <Link

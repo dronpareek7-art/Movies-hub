@@ -6,6 +6,8 @@ import { Moviecontext } from "../Component/Router";
 import { FaPlay } from "react-icons/fa";
 import { baseImageUrl } from "../data";
 import LocationData from "./LocationData";
+import { BsBookmarkPlusFill, BsBookmarkCheckFill } from "react-icons/bs";
+
 function SingleMovie() {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
@@ -88,21 +90,60 @@ function SingleMovie() {
 
   if (!movie)
     return (
-      <div className="single-movie">
-        <div className="movie-container">
-          <div className="skeleton poster"></div>
+      <>
+        <div className="single-movie">
+          <div className="movie-container">
+            <div className="skeleton poster"></div>
 
-          <div className="movie-details">
-            <div className="skeleton title"></div>
-            <div className="skeleton text"></div>
-            <div className="skeleton text"></div>
-            <div className="skeleton text small"></div>
-            <div className="skeleton text small"></div>
-            <div className="skeleton btn"></div>
-            <div className="skeleton btn"></div>
+            <div className="movie-details">
+              <div className="skeleton title"></div>
+
+              <div className="skeleton text"></div>
+              <div className="skeleton text"></div>
+              <div className="skeleton text"></div>
+
+              <div className="skeleton text small"></div>
+              <div className="skeleton text small"></div>
+
+              <div className="btn-group">
+                <div className="skeleton btn"></div>
+                <div className="skeleton btn"></div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+        <div className="cast-wrapper">
+          <h2 className="cast-heading">Cast</h2>
+
+          <div className="cast-container">
+            {cast.length === 0
+              ? Array.from({ length: 8 }).map((_, i) => (
+                  <div className="cast-card" key={i}>
+                    <div className="skeleton cast-img"></div>
+                    <div className="skeleton cast-text"></div>
+                    <div className="skeleton cast-text small"></div>
+                  </div>
+                ))
+              : cast.slice(0, 12).map((actor) => (
+                  <Link to={`/person/${actor.id}`} key={actor.id}>
+                    <div className="cast-card">
+                      {actor.profile_path ? (
+                        <img
+                          src={`${baseImageUrl}${actor.profile_path}`}
+                          alt={actor.name}
+                        />
+                      ) : (
+                        <div className="no-image"></div>
+                      )}
+
+                      <p>{actor.name}</p>
+                      <p>as {actor.character}</p>
+                    </div>
+                  </Link>
+                ))}
+          </div>
+        </div>
+      </>
     );
   return (
     <>
@@ -135,8 +176,17 @@ function SingleMovie() {
             </p>
             <p className="movie-info">
               📅 <span className="details-heading">Release Date: </span>
-              {movie.release_date || movie.first_air_date}
+              {movie.release_date || movie.first_air_date
+                ? new Date(
+                    movie.release_date || movie.first_air_date,
+                  ).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "2-digit",
+                  })
+                : ""}
             </p>
+
             <p className="movie-info">
               <span className="details-heading">Movie Language: </span>{" "}
               {movie.spoken_languages.map((s) => s.english_name).join(",") ||
@@ -162,9 +212,17 @@ function SingleMovie() {
                 }
               >
                 {" "}
-                {isInWatchlist(movie.id)
-                  ? `  Remove from watchlist`
-                  : " Add to watchlist"}
+                {isInWatchlist(movie.id) ? (
+                  <span>
+                    {" "}
+                    <BsBookmarkCheckFill /> Remove from watchlist
+                  </span>
+                ) : (
+                  <span>
+                    {" "}
+                    <BsBookmarkPlusFill /> Add to watchlist
+                  </span>
+                )}
               </button>
             </div>
 

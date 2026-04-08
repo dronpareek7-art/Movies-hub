@@ -29,6 +29,7 @@
   position: relative;
   z-index: 2;
   display: flex;
+  align-items: flex-start;
   gap: 40px;
   width: 100%;
   background: rgba(57, 57, 103, 0.667);
@@ -153,13 +154,13 @@
 }
 .trailer-btn,
 .watchlist-btn {
-  width: fit-content; /* 🔥 main fix */
-  min-width: 200px; /* optional for consistency */
+  width: fit-content;
+  min-width: 200px;
 }
 .btn-group {
   display: flex;
   gap: 14px;
-  flex-wrap: wrap; /* mobile safe */
+  flex-wrap: wrap;
 }
 .trailer-btn,
 .watchlist-btn,
@@ -218,7 +219,7 @@
 
 .close-btn {
   position: absolute;
-  top: 28px;
+  top: 0;
   right: 0;
   background: #ef4444;
   color: white;
@@ -428,6 +429,22 @@
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 10px;
+  display: block;
+}
+.skeleton.cast-img {
+  width: 100%;
+  height: 250px;
+  border-radius: 12px;
+}
+
+.skeleton.cast-text {
+  width: 80%;
+  height: 12px;
+  margin: 8px auto 0;
+}
+
+.skeleton.cast-text.small {
+  width: 60%;
 }
 
 @keyframes shimmer {
@@ -440,9 +457,10 @@
 }
 
 .skeleton.poster {
-  width: 260px;
-  height: 390px;
+  width: 270px;
+  height: 450px;
   border-radius: 15px;
+  flex-shrink: 0;
 }
 
 .skeleton.title {
@@ -460,8 +478,9 @@
 }
 
 .skeleton.btn {
-  width: 160px;
+  width: 180px;
   height: 40px;
+  border-radius: 30px;
   margin-top: 10px;
 }
 
@@ -498,7 +517,7 @@
 
 .cast-card {
   flex: 0 0 auto;
-  width:170px;
+  width: 150px;
   text-align: center;
   transition: all 0.3s ease;
 }
