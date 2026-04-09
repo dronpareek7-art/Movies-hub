@@ -8,9 +8,10 @@ import { useContext } from "react";
 import { Moviecontext } from "./Router";
 
 function Header() {
-  const searchRef = useRef(null)
+  const searchRef = useRef(null);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
+  const [genres, setGenres] = useState([]);
   const navigate = useNavigate();
   const { handleLogout, user, Watchlist } = useContext(Moviecontext);
   const dummyPerson = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
@@ -42,7 +43,6 @@ function Header() {
     function handleClickOutside(event) {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setSuggestions([]);
-        setActiveIndex(-1);
       }
     }
 
@@ -51,6 +51,20 @@ function Header() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
+  }, []);
+  useEffect(() => {
+    async function fetchGenres() {
+      const API_KEY = import.meta.env.VITE_API_KEY;
+
+      const res = await fetch(
+        `https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}`,
+      );
+
+      const data = await res.json();
+      setGenres(data.genres || []);
+    }
+
+    fetchGenres();
   }, []);
 
   function handleClick(item) {
@@ -67,6 +81,24 @@ function Header() {
 
       <div className="search-bar" ref={searchRef}>
         <div className="search-wrapper">
+          <select className="genre-select"
+            onChange={(e) => {
+              if (e.target.value) {
+                navigate(`/genre/${e.target.value}`);
+              } else {
+                navigate("/");
+              }
+            }}
+          >
+            <option value="">All</option>
+            {genres.map((genre) => (
+              <option key={genre.id} value={genre.id}>
+                {genre.name}
+              </option>
+            ))}
+          </select>
+           <span className="arrow">▼</span>
+          <div className="divider"></div>
           <input
             type="text"
             placeholder="Search Here..."
@@ -111,13 +143,18 @@ function Header() {
 
       <nav className="nav-links">
         <Link to="/Watchlist">
-          Watchlist ({Watchlist.length})<BsBookmarkPlusFill size={16} />
+          Watchlist
+          <BsBookmarkPlusFill size={16} />
         </Link>
 
         {user ? (
-          <button onClick={handleLogout} className="login-btn">Log out</button>
+          <button onClick={handleLogout} className="login-btn">
+            Log out
+          </button>
         ) : (
-          <Link to="/login" className="login-btn">Login</Link>
+          <Link to="/login" className="login-btn">
+            Login
+          </Link>
         )}
       </nav>
     </header>

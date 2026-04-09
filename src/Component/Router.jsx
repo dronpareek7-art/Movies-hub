@@ -16,6 +16,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import ScrollToTop from "./ScrollToTop";
+import GenrePage from "../Pages/GenrePage";
 
 function Router() {
   const [Watchlist, setWatchlist] = useState([]);
@@ -109,6 +110,7 @@ function Router() {
           <Route path="/movie/:id" element={<SingleMovie />} />
           <Route path="/tv/:id" element={<SingleMovie />} />
           <Route path="/person/:id" element={<SinglePerson />} />
+          <Route path="/genre/:id" element={<GenrePage/>}/>
           <Route path="*" element={<NotFound />}></Route>
         </Routes>
         <Footer />

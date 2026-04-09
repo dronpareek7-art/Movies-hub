@@ -79,10 +79,7 @@ function Home({ urls, heading, btn1, btn2 }) {
           </div>
         ) : movieData.length > 0 ? (
           movieData.map((item) => (
-            <div
-              key={item.id}
-              className="movie-card"
-            >
+            <div key={item.id} className="movie-card">
               <div className="poster-wrapper">
                 {(item.poster_path || item.profile_path) && (
                   <Link

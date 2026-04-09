@@ -120,9 +120,9 @@ function LocationData() {
           reject(err);
         },
         {
-          enableHighAccuracy: true, // Use GPS if available
-          timeout: 10000, // 10 seconds
-          maximumAge: 300000, // Accept cached position up to 5 minutes old
+          enableHighAccuracy: true, 
+          timeout: 15000, // 10 seconds
+          maximumAge: 300000, 
         }
       );
     });
@@ -152,9 +152,9 @@ function LocationData() {
     ? `
       [out:json][timeout:25];
       (
-        node["amenity"="cinema"](around:30000,${lat},${lng});
-        way["amenity"="cinema"](around:30000,${lat},${lng});
-        relation["amenity"="cinema"](around:30000,${lat},${lng});
+        node["amenity"="cinema"](around:20000,${lat},${lng});
+        way["amenity"="cinema"](around:20000,${lat},${lng});
+        relation["amenity"="cinema"](around:20000,${lat},${lng});
       );
       out center;
     `

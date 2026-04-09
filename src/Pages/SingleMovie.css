@@ -550,7 +550,114 @@
   font-size: 12px;
   color: #e2e8f0;
 }
+/* 🔥 Wrapper */
+.reviews-wrapper {
+  padding: 40px 20px;
+}
 
+.reviews-heading {
+  margin: 5px 15px; 
+  background: linear-gradient(to right, #fff, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.reviews-container {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 20px;
+}
+.rating {
+  margin: 15px 30px;
+}
+
+.review-card {
+  background: rgba(0, 0, 0, 0.75);
+  padding: 18px;
+  border-radius: 12px;
+  color: #fff;
+  transition: 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.review-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.review-author {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.review-rating {
+  color: gold;
+  margin-bottom: 8px;
+}
+
+.review-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #ccc;
+}
+.no-reviews {
+  color: #888;
+  font-style: italic;
+  margin: 0 30px;
+}
+
+.custom-reviews-list {
+  margin-top: 40px;
+}
+
+.custom-review-section {
+  margin-top: 50px;
+}
+
+.review-textarea {
+  width: 50%;
+  height: 120px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  margin: 15px 30px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.review-textarea::placeholder {
+  color: #bbb;
+}
+
+/* Rating stars */
+.rating span {
+  margin-right: 5px;
+  transition: 0.2s;
+}
+
+.rating span:hover {
+  transform: scale(1.2);
+}
+
+/* Submit button */
+.submit-review-btn {
+  padding: 10px 22px;
+  background: #e50914;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.3s;
+  margin: 0px 30px;
+}
+
+.submit-review-btn:hover {
+  background: #b20710;
+}
 @media (max-width: 768px) {
   .cast-card {
     width: 150px;
@@ -580,7 +687,8 @@
 .theatre-list {
   margin-top: 15px;
   display: grid;
- grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
   flex: wrap;
 }
 .theatre-list a {

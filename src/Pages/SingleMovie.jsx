@@ -9,13 +9,22 @@ import LocationData from "./LocationData";
 import { BsBookmarkPlusFill, BsBookmarkCheckFill } from "react-icons/bs";
 import { toast } from "react-toastify";
 
+import { db } from "../firebase";
+import { collection, addDoc, getDocs } from "firebase/firestore";
+
 function SingleMovie() {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const [trailerKey, setTrailerkey] = useState(null);
   const [Showtrailer, setShowTrailer] = useState(false);
   const [cast, setCast] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const Location = useLocation();
+
+  const [userReview, setUserReview] = useState("");
+  const [userRating, setUserRating] = useState(0);
+  const [customReviews, setCustomReviews] = useState([]);
+
   const isTV = Location.pathname.includes("/tv");
   let { Addtowatchlist, Watchlist, removeFromWatchlist, isInWatchlist, user } =
     useContext(Moviecontext);
@@ -33,6 +42,7 @@ function SingleMovie() {
 
   useEffect(() => {
     fetchMovie();
+    fetchCustomReviews();
   }, [id, isTV]);
 
   async function fetchMovie() {
@@ -55,6 +65,15 @@ function SingleMovie() {
     const creditData = await creditRes.json();
 
     setCast(creditData.cast || []);
+
+    // Reviews Fetch
+    const reviewRes = await fetch(
+      `https://api.themoviedb.org/3/${type}/${id}/reviews?api_key=${API_KEY}`,
+    );
+
+    const reviewData = await reviewRes.json();
+    console.log(reviewData);
+    setReviews(reviewData.results || []);
   }
   async function handleTrailer() {
     if (Showtrailer) {
@@ -80,6 +99,37 @@ function SingleMovie() {
       setShowTrailer(true);
       console.log(trailer);
     }
+  }
+  async function handleSubmitReview() {
+    if (!user) {
+      toast.info("Login required first");
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "reviews"), {
+        movieId: id,
+        userName: user.email.split("@")[0].replace(/[0-9.]/g, ""),
+        review: userReview,
+        createdAt: new Date(),
+      });
+
+      setUserReview("");
+      setUserRating(0);
+
+      fetchCustomReviews();
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  async function fetchCustomReviews() {
+    const snapshot = await getDocs(collection(db, "reviews"));
+
+    const data = snapshot.docs
+      .map((doc) => doc.data())
+      .filter((r) => r.movieId === id);
+
+    setCustomReviews(data);
   }
   function handleBooking(movie, city) {
     window.open(
@@ -255,9 +305,7 @@ function SingleMovie() {
               ) : (
                 <div className="theatre-list">
                   {theatres.length === 0 ? (
-                    <p className="location-text">
-                      {/* {city || "your area"}. */}
-                    </p>
+                    <p className="location-text"></p>
                   ) : (
                     theatres.map((t, i) => (
                       <div
@@ -319,6 +367,54 @@ function SingleMovie() {
             </Link>
           ))}
         </div>
+      </div>
+      <div className="reviews-wrapper">
+        <h2 className="reviews-heading">Reviews</h2>
+
+        <div className="reviews-container">
+          {reviews.length === 0 ? (
+            <p className="no-reviews">No reviews available 😢</p>
+          ) : (
+            reviews.slice(0, 5).map((review) => (
+              <div className="review-card" key={review.id}>
+                <h4>{review.author}</h4>
+                <p>⭐ {review.author_details?.rating || "N/A"}</p>
+                <p className="review-content">
+                  {review.content.slice(0, 150)}...
+                </p>
+              </div>
+            ))
+          )}
+        </div>
+        <div className="custom-reviews-list">
+          <h2 className="reviews-heading">User Reviews</h2>
+
+          {customReviews.length === 0 ? (
+            <p className="no-reviews">No user reviews yet 😢</p>
+          ) : (
+            <div className="reviews-container">
+              {customReviews.map((r, i) => (
+                <div key={i} className="review-card">
+                  <h4 className="review-author">{r.userName}</h4>
+                  <p className="review-content">{r.review}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="custom-review-section">
+        <h2 className="reviews-heading">Add Your Review</h2>
+
+        <textarea
+          className="review-textarea"
+          placeholder="Write your review..."
+          value={userReview}
+          onChange={(e) => setUserReview(e.target.value)}
+        />
+        <button className="submit-review-btn" onClick={handleSubmitReview}>
+          Submit Review
+        </button>
       </div>
     </>
   );

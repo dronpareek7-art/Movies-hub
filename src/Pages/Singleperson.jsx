@@ -58,7 +58,7 @@ function SinglePerson() {
         <div className="sp-movies-section">
           <h2>Movies</h2>
 
-          <div className="sp-movies-grid">
+          <div className="sp-movies-grid">  
             {[...Array(8)].map((_, i) => (
               <div key={i} className="sp-movie-card">
                 <div className="skeleton sp-movie-img-skeleton"></div>
