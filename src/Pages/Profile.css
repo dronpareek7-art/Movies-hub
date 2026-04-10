@@ -1,0 +1,120 @@
+.profile-wrapper {
+  min-height: 100vh;
+  background: #020617;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px; /* IMPORTANT for small screens */
+}
+
+/* CARD */
+.profile-card {
+  background: #1e293b;
+  padding: 25px;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 380px; /* responsive width */
+  color: white;
+}
+
+/* IMAGE */
+.profile-image {
+  position: relative;
+  width: 90px;
+  margin: auto;
+}
+
+.profile-image img {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #be4523;
+}
+
+.edit-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: #e11d48;
+  color: black;
+  border-radius: 50%;
+  padding: 5px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+/* FORM */
+.profile-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.profile-card label {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.profile-card input {
+  padding: 9px;
+  border-radius: 8px;
+  border: none;
+  background: #020617;
+  color: white;
+  font-size: 14px;
+}
+
+/* GENDER */
+.gender {
+  display: flex;
+  gap: 15px;
+  font-size: 13px;
+  flex-wrap: wrap; /* important for small screens */
+}
+
+/* BUTTON */
+.profile-card button {
+  margin-top: 12px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #e11d48;
+  color: #020617;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  width: 100%; /* full width button */
+}
+
+.profile-card button:hover {
+  background: #db0735;
+}
+/* Tablets */
+@media (min-width: 600px) {
+  .profile-card {
+    padding: 30px;
+    max-width: 420px;
+  }
+
+  .profile-image img {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .profile-card {
+    max-width: 450px;
+    padding: 35px;
+  }
+
+  .profile-card input {
+    padding: 11px;
+  }
+
+  .profile-card label {
+    font-size: 13px;
+  }
+}

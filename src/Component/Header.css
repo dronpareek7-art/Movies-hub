@@ -6,13 +6,13 @@
 
 .header {
   width: 100%;
-  height: 70px;
-
+  height: 60px;
+  overflow: visible;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 0 30px;
+  padding: 0 20px;
 
   position: sticky;
   top: 0;
@@ -52,22 +52,25 @@
 
 .search-bar {
   flex: 1;
+  max-width: 500px;
   display: flex;
+  position: relative;
+  z-index: 2000;
   justify-content: center;
+  margin: 0 auto;
 }
 
 .search-wrapper {
   position: relative;
-  display: flex;
+
+  height: 40px;
+   display: flex;
   align-items: center;
-
-  width: 100%;
-  max-width: 360px;
-
   background: rgba(255, 255, 255, 0.08);
-  border-radius: 25px;
-
+  border-radius: 30px;
   overflow: visible;
+  width: 100%;
+
   transition: 0.3s;
 }
 
@@ -78,14 +81,14 @@
 
 .search-wrapper input {
   flex: 1;
-  padding: 10px 15px;
+  font-size: 13px;
+  padding: 0 10px;
+  background: transparent;
+  color: white;
 
   border: none;
   outline: none;
 
-  background: transparent;
-  color: white;
-  font-size: 14px;
 }
 
 .search-wrapper input::placeholder {
@@ -101,33 +104,31 @@
   justify-content: center;
 
   border: none;
-  border-radius: 50%;
+  border-radius: 0 30px 30px 0;
 
   background: linear-gradient(135deg, #f43f5e, #e11d48);
   color: white;
 
   cursor: pointer;
-  transition: 0.3s;
 }
 
 .search-btn:hover {
-  transform: scale(1.1);
   box-shadow: 0 0 12px rgba(244, 63, 94, 0.6);
 }
 
 .suggestions {
   position: absolute;
-  top: 110%;
+  top: 105%;
   left: 0;
   width: 100%;
 
   background: #020617;
-  border-radius: 12px;
+  border-radius: 10px;
 
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  z-index: 9999;
+  z-index: 99999;
 
-  overflow: hidden;
+  overflow: visible;
   animation: fadeIn 0.2s ease-in-out;
 }
 
@@ -166,6 +167,7 @@
   display: flex;
   align-items: center;
   gap: 18px;
+  /* z-index: 1000; */
 }
 
 .nav-links a {
@@ -286,27 +288,15 @@
     justify-content: space-between;
   }
 }
-/* 🔥 Make wrapper like imdb search */
-.search-wrapper {
-  display: flex;
-  align-items: center;
 
-  width: 100%;
-  max-width: 500px;
 
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 30px;
-  overflow: hidden;
-}
-
-/* 🔥 Genre select inside */
 .genre-select {
   background: transparent;
   border: none;
   outline: none;
   color: #fff;
-
-  padding: 10px 12px;
+  width: 140px;
+  padding: 0px 0px 0px 35px;
   font-size: 14px;
   cursor: pointer;
 
@@ -322,19 +312,52 @@
   height: 20px;
   background: rgba(255, 255, 255, 0.2);
 }
-.arrow{
-  color: #e11d48;
-}
-.search-wrapper input {
-  flex: 1;
-  padding: 10px 12px;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: white;
-}
 
-/* 🔥 Button adjust */
-.search-btn {
-  margin-right: 5px;
+
+
+@media (max-width: 768px) {
+  .header {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    height: auto;
+  }
+
+  .search-bar {
+    order: 3;
+    width: 80%;
+    max-width: 100%;
+    margin-top: 10px;
+  }
+
+  .search-wrapper {
+    width: 100%;
+  }
+  .search-wrapper input {
+    padding: 0 0;
+    width: 70px;
+  }
+  .genre-select {
+    width: 80px;
+    padding: 0px 0px 0px 12px;
+  }
+ 
+}
+@media (max-width: 600px) {
+  .header {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 10px;
+  }
+
+  .logo {
+    font-size: 18px;
+  }
+
+  .search-bar {
+    width: 100%;
+  }
+
+  .search-wrapper {
+    height: 38px;
+  }
 }

@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { baseImageUrl } from "../data";
 import "./SinglePerson.css";
+import { options } from "../data";
 
 function SinglePerson() {
   const { id } = useParams();
@@ -11,30 +12,27 @@ function SinglePerson() {
   const [loadingMovies, setLoadingMovies] = useState(true);
 
   useEffect(() => {
-    async function fetchPerson() {
-      const API_KEY = import.meta.env.VITE_API_KEY;
+ async function fetchPerson() {
+  const personURL = `https://api.themoviedb.org/3/person/${id}`;
+  const movieURL = `https://api.themoviedb.org/3/person/${id}/movie_credits`;
 
-      try {
-        const res = await fetch(
-          `https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}`,
-        );
-        const data = await res.json();
-        setPerson(data);
+  try {
+    const [personRes, movieRes] = await Promise.all([
+      fetch(personURL, options),
+      fetch(movieURL, options),
+    ]);
 
-        setLoadingMovies(true);
+    const personData = await personRes.json();
+    const movieData = await movieRes.json();
 
-        const movieRes = await fetch(
-          `https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${API_KEY}`,
-        );
-        const movieData = await movieRes.json();
-
-        setMovies(movieData.cast || []);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoadingMovies(false);
-      }
-    }
+    setPerson(personData);
+    setMovies(movieData.cast || []);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoadingMovies(false); 
+  }
+}
 
     fetchPerson();
   }, [id]);
@@ -58,7 +56,7 @@ function SinglePerson() {
         <div className="sp-movies-section">
           <h2>Movies</h2>
 
-          <div className="sp-movies-grid">  
+          <div className="sp-movies-grid">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="sp-movie-card">
                 <div className="skeleton sp-movie-img-skeleton"></div>

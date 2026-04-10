@@ -4,23 +4,37 @@ import "./Home.css";
 import { Link, useNavigate } from "react-router-dom";
 import { BsBookmarkPlusFill, BsBookmarkCheckFill } from "react-icons/bs";
 import { Moviecontext } from "./Component/Router";
+import { options } from "./data";
 import { toast } from "react-toastify";
 
 function Home({ urls, heading, btn1, btn2 }) {
   const [movieData, setMovieData] = useState([]);
-  const [showData, setShowData] = useState(urls[0]);
+  const [showData, setShowData] = useState([urls[0]]); 
   const [loading, setLoading] = useState(true);
+
   let { Addtowatchlist, removeFromWatchlist, isInWatchlist, user } =
     useContext(Moviecontext);
+
   const navigate = useNavigate();
-  const isTV = showData.includes("tv");
-  const isPerson = showData.includes("person");
+
+  const currentUrl = showData[0]; 
+  const isTV = currentUrl.includes("tv");
+  const isPerson = currentUrl.includes("person");
+
   useEffect(() => {
     async function fetchMovies() {
       try {
-        const response = await fetch(showData);
-        const result = await response.json();
-        setMovieData(result.results || []);
+        setLoading(true);
+
+        const responses = await Promise.all(
+          showData.map((url) => fetch(url, options)),
+        );
+
+        const results = await Promise.all(responses.map((res) => res.json()));
+
+        const combinedData = results.flatMap((r) => r.results || []);
+
+        setMovieData(combinedData);
       } catch (error) {
         console.error("Error fetching movies:", error);
       } finally {
@@ -32,28 +46,27 @@ function Home({ urls, heading, btn1, btn2 }) {
   }, [showData]);
 
   function trimContent(content) {
-    if (content.length > 20) {
-      return content.slice(0, 20) + "...";
-    }
-    return content;
+    if (!content) return "";
+    return content.length > 20 ? content.slice(0, 20) + "..." : content;
   }
 
   return (
     <section className="home-section">
       <header className="home-header">
         <h2>{heading}</h2>
-        {!isPerson && (
+
+        {!isPerson && urls.length > 1 && (
           <div className="toggle-buttons">
             <button
-              className={showData === urls[0] ? "active-btn" : ""}
-              onClick={() => setShowData(urls[0])}
+              className={currentUrl === urls[0] ? "active-btn" : ""}
+              onClick={() => setShowData([urls[0]])} 
             >
               {btn1}
             </button>
 
             <button
-              className={showData === urls[1] ? "active-btn" : ""}
-              onClick={() => setShowData(urls[1])}
+              className={currentUrl === urls[1] ? "active-btn" : ""}
+              onClick={() => setShowData([urls[1]])} 
             >
               {btn2}
             </button>
@@ -90,12 +103,15 @@ function Home({ urls, heading, btn1, btn2 }) {
                     }
                   >
                     <img
-                      src={`${baseImageUrl}${item.poster_path || item.profile_path}`}
+                      src={`${baseImageUrl}${
+                        item.poster_path || item.profile_path
+                      }`}
                       alt={item.title || item.name}
                       loading="lazy"
                     />
                   </Link>
                 )}
+
                 <button
                   onClick={() => {
                     if (!user) {
@@ -103,6 +119,7 @@ function Home({ urls, heading, btn1, btn2 }) {
                       navigate("/login");
                       return;
                     }
+
                     if (isInWatchlist(item.id)) {
                       removeFromWatchlist(item.id);
                       toast.error("Removed from Watchlist ❌");
@@ -114,7 +131,6 @@ function Home({ urls, heading, btn1, btn2 }) {
                     }
                   }}
                   className="watchlist-icon"
-                  title="Add to watchlist"
                 >
                   {isInWatchlist(item.id) ? (
                     <BsBookmarkCheckFill />

@@ -4,7 +4,7 @@ import "./SingleMovie.css";
 import { useContext } from "react";
 import { Moviecontext } from "../Component/Router";
 import { FaPlay } from "react-icons/fa";
-import { baseImageUrl } from "../data";
+import { baseImageUrl, options } from "../data";
 import LocationData from "./LocationData";
 import { BsBookmarkPlusFill, BsBookmarkCheckFill } from "react-icons/bs";
 import { toast } from "react-toastify";
@@ -14,21 +14,24 @@ import { collection, addDoc, getDocs } from "firebase/firestore";
 
 function SingleMovie() {
   const { id } = useParams();
+  const Location = useLocation();
+
   const [movie, setMovie] = useState(null);
   const [trailerKey, setTrailerkey] = useState(null);
   const [Showtrailer, setShowTrailer] = useState(false);
   const [cast, setCast] = useState([]);
   const [reviews, setReviews] = useState([]);
-  const Location = useLocation();
 
-  const [userReview, setUserReview] = useState("");
-  const [userRating, setUserRating] = useState(0);
+  const [userReview, setUserReview] = useState(""); 
   const [customReviews, setCustomReviews] = useState([]);
 
   const isTV = Location.pathname.includes("/tv");
-  let { Addtowatchlist, Watchlist, removeFromWatchlist, isInWatchlist, user } =
+
+  let { Addtowatchlist, removeFromWatchlist, isInWatchlist, user } =
     useContext(Moviecontext);
+
   const navigate = useNavigate();
+
   const {
     location,
     city,
@@ -45,61 +48,63 @@ function SingleMovie() {
     fetchCustomReviews();
   }, [id, isTV]);
 
-  async function fetchMovie() {
-    const API_KEY = import.meta.env.VITE_API_KEY;
-    const type = isTV ? "tv" : "movie";
+  async function fetchCustomReviews() {
+    const snapshot = await getDocs(collection(db, "reviews"));
 
+    const data = snapshot.docs
+      .map((doc) => doc.data())
+      .filter((r) => r.movieId === id);
+
+    setCustomReviews(data);
+  }
+
+  async function fetchMovie() {
     try {
-      const res = await fetch(
-        `https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}`,
-      );
-      const data = await res.json();
-      setMovie(data);
-      console.log(data);
+      const type = isTV ? "tv" : "movie";
+
+      const [movieRes, castRes, reviewRes] = await Promise.all([
+        fetch(`https://api.themoviedb.org/3/${type}/${id}`, options),
+        fetch(`https://api.themoviedb.org/3/${type}/${id}/credits`, options),
+        fetch(`https://api.themoviedb.org/3/${type}/${id}/reviews`, options),
+      ]);
+
+      const movieData = await movieRes.json();
+      const castData = await castRes.json();
+      const reviewData = await reviewRes.json();
+
+      setMovie(movieData);
+      setCast(castData.cast || []); 
+      setReviews((reviewData.results || []).slice(0, 5));
     } catch (err) {
       console.log(err);
     }
-    const creditRes = await fetch(
-      ` https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`,
-    );
-    const creditData = await creditRes.json();
-
-    setCast(creditData.cast || []);
-
-    // Reviews Fetch
-    const reviewRes = await fetch(
-      `https://api.themoviedb.org/3/${type}/${id}/reviews?api_key=${API_KEY}`,
-    );
-
-    const reviewData = await reviewRes.json();
-    console.log(reviewData);
-    setReviews(reviewData.results || []);
   }
+
   async function handleTrailer() {
     if (Showtrailer) {
       setShowTrailer(false);
       return;
     }
 
-    const API_KEY = import.meta.env.VITE_API_KEY;
     const type = isTV ? "tv" : "movie";
 
     const res = await fetch(
-      `https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${API_KEY}`,
+      `https://api.themoviedb.org/3/${type}/${id}/videos`,
+      options,
     );
 
     const data = await res.json();
 
-    const trailer = data.results.find(
+    const trailer = (data.results || []).find(
       (vid) => vid.type === "Trailer" && vid.site === "YouTube",
     );
 
     if (trailer) {
       setTrailerkey(trailer.key);
       setShowTrailer(true);
-      console.log(trailer);
     }
   }
+
   async function handleSubmitReview() {
     if (!user) {
       toast.info("Login required first");
@@ -115,22 +120,12 @@ function SingleMovie() {
       });
 
       setUserReview("");
-      setUserRating(0);
-
       fetchCustomReviews();
     } catch (err) {
       console.log(err);
     }
   }
-  async function fetchCustomReviews() {
-    const snapshot = await getDocs(collection(db, "reviews"));
 
-    const data = snapshot.docs
-      .map((doc) => doc.data())
-      .filter((r) => r.movieId === id);
-
-    setCustomReviews(data);
-  }
   function handleBooking(movie, city) {
     window.open(
       `https://www.google.com/search?q=${encodeURIComponent(
@@ -140,77 +135,22 @@ function SingleMovie() {
     );
   }
 
-  if (!movie)
-    return (
-      <>
-        <div className="single-movie">
-          <div className="movie-container">
-            <div className="skeleton poster"></div>
+  if (!movie) return <div className="loading">Loading...</div>;
 
-            <div className="movie-details">
-              <div className="skeleton title"></div>
-
-              <div className="skeleton text"></div>
-              <div className="skeleton text"></div>
-              <div className="skeleton text"></div>
-
-              <div className="skeleton text small"></div>
-              <div className="skeleton text small"></div>
-
-              <div className="btn-group">
-                <div className="skeleton btn"></div>
-                <div className="skeleton btn"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="cast-wrapper">
-          <h2 className="cast-heading">Cast</h2>
-
-          <div className="cast-container">
-            {cast.length === 0
-              ? Array.from({ length: 8 }).map((_, i) => (
-                  <div className="cast-card" key={i}>
-                    <div className="skeleton cast-img"></div>
-                    <div className="skeleton cast-text"></div>
-                    <div className="skeleton cast-text small"></div>
-                  </div>
-                ))
-              : cast.slice(0, 12).map((actor) => (
-                  <Link to={`/person/${actor.id}`} key={actor.id}>
-                    <div className="cast-card">
-                      {actor.profile_path ? (
-                        <img
-                          src={`${baseImageUrl}${actor.profile_path}`}
-                          alt={actor.name}
-                        />
-                      ) : (
-                        <div className="no-image"></div>
-                      )}
-
-                      <p>{actor.name}</p>
-                      <p>as {actor.character}</p>
-                    </div>
-                  </Link>
-                ))}
-          </div>
-        </div>
-      </>
-    );
   return (
     <>
       <div
         className="single-movie"
         style={{
           backgroundImage: movie.backdrop_path
-            ? `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`
-            : `url(https://image.tmdb.org/t/p/w500${movie.poster_path})`,
+            ? `url(${baseImageUrl}${movie.backdrop_path})`
+            : `url(${baseImageUrl}${movie.poster_path})`,
         }}
       >
         <div className="movie-container">
           <img
             className="movie-poster"
-            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+            src={`${baseImageUrl}${movie.poster_path}`}
             alt={movie.title || movie.name}
           />
 
@@ -223,43 +163,44 @@ function SingleMovie() {
             </p>
 
             <p className="movie-info">
-              ⭐ <span className="details-heading">Rating: </span>{" "}
+              <span className="details-heading">Rating:</span> ⭐{" "}
               {movie.vote_average}
             </p>
+
             <p className="movie-info">
-              📅 <span className="details-heading">Release Date: </span>
+              <span className="details-heading">Release Date:</span>
               {movie.release_date || movie.first_air_date
                 ? new Date(
                     movie.release_date || movie.first_air_date,
                   ).toLocaleDateString("en-US", {
-                    year: "numeric",
+                    day: "numeric",
                     month: "long",
-                    day: "2-digit",
+                    year: "numeric",
                   })
                 : ""}
             </p>
-
             <p className="movie-info">
-              <span className="details-heading">Movie Language: </span>{" "}
-              {movie.spoken_languages.map((s) => s.english_name).join(",") ||
-                "N/A"}
+              <span className="details-heading">Language:</span>{" "}
+              {(movie.spoken_languages || [])
+                .map((s) => s.english_name)
+                .join(", ")}
             </p>
 
             <p className="movie-info">
-              {" "}
-              <span className="details-heading"> Genres:</span>
-              {movie.genres.map((g) => g.name).join(", ") || "N/A"}
+              <span className="details-heading">Genres:</span>{" "}
+              {(movie.genres || []).map((g) => g.name).join(", ")}
             </p>
+
             <div className="btn-group">
               <button onClick={handleTrailer} className="trailer-btn">
-                <FaPlay /> {""}
-                {Showtrailer ? "Close Trailer" : "Watch Trailer"}
+                <FaPlay />
+                {Showtrailer ? " Close Trailer" : " Watch Trailer"}
               </button>
+
               <button
                 className="watchlist-btn"
                 onClick={() => {
                   if (!user) {
-                    toast.info("Login required first");
                     navigate("/login");
                     return;
                   }
@@ -268,17 +209,14 @@ function SingleMovie() {
                     : Addtowatchlist(movie);
                 }}
               >
-                {" "}
                 {isInWatchlist(movie.id) ? (
-                  <span>
-                    {" "}
-                    <BsBookmarkCheckFill /> Remove from watchlist
-                  </span>
+                  <>
+                    <BsBookmarkCheckFill /> Remove From Watchlist
+                  </>
                 ) : (
-                  <span>
-                    {" "}
-                    <BsBookmarkPlusFill /> Add to watchlist
-                  </span>
+                  <>
+                    <BsBookmarkPlusFill /> Add To Watchlist
+                  </>
                 )}
               </button>
             </div>
@@ -294,31 +232,25 @@ function SingleMovie() {
                 Show Nearest Theater
               </button>
 
-              {loading && (
-                <p className="location-text"> Fetching your Location...</p>
-              )}
-              {error && <p className="location-text">{error}</p>}
+              {loading && <p>Fetching your Location...</p>}
+              {error && <p>{error}</p>}
+              {city && <p>📍 {city}</p>}
 
-              {city && <p className="location-text">📍 {city}</p>}
               {loadingTheatre ? (
-                <p className="location-text">Loading theatres... 🎬</p>
+                <p>Loading theatres...</p>
               ) : (
                 <div className="theatre-list">
-                  {theatres.length === 0 ? (
-                    <p className="location-text"></p>
-                  ) : (
-                    theatres.map((t, i) => (
-                      <div
-                        key={`${t.lat}-${t.lng}-${i}`}
-                        className="theatre-card"
-                        onClick={() =>
-                          handleBooking(movie.title || movie.name, city)
-                        }
-                      >
-                        <h4>{t.name}</h4>
-                      </div>
-                    ))
-                  )}
+                  {theatres.map((t, i) => (
+                    <div
+                      key={i}
+                      className="theatre-card"
+                      onClick={() =>
+                        handleBooking(movie.title || movie.name, city)
+                      }
+                    >
+                      <h4>{t.name}</h4>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -330,7 +262,6 @@ function SingleMovie() {
                     className="close-btn"
                     onClick={() => setShowTrailer(false)}
                   >
-                    {" "}
                     ✖
                   </button>
 
@@ -345,11 +276,12 @@ function SingleMovie() {
           </div>
         </div>
       </div>
+
       <div className="cast-wrapper">
         <h2 className="cast-heading">Cast</h2>
 
         <div className="cast-container">
-          {cast.slice(0, 12).map((actor) => (
+          {(cast || []).slice(0, 12).map((actor) => (
             <Link to={`/person/${actor.id}`} key={actor.id}>
               <div className="cast-card">
                 {actor.profile_path ? (
@@ -360,7 +292,6 @@ function SingleMovie() {
                 ) : (
                   <div className="no-image"></div>
                 )}
-
                 <p>{actor.name}</p>
                 <p>as {actor.character}</p>
               </div>
@@ -380,12 +311,13 @@ function SingleMovie() {
                 <h4>{review.author}</h4>
                 <p>⭐ {review.author_details?.rating || "N/A"}</p>
                 <p className="review-content">
-                  {review.content.slice(0, 150)}...
+                  {(review.content || "").slice(0, 150)}...
                 </p>
               </div>
             ))
           )}
         </div>
+
         <div className="custom-reviews-list">
           <h2 className="reviews-heading">User Reviews</h2>
 
@@ -403,8 +335,9 @@ function SingleMovie() {
           )}
         </div>
       </div>
+
       <div className="custom-review-section">
-        <h2 className="reviews-heading">Add Your Review</h2>
+        <h2 className="reviews-heading">Post Your Review</h2>
 
         <textarea
           className="review-textarea"
@@ -412,6 +345,7 @@ function SingleMovie() {
           value={userReview}
           onChange={(e) => setUserReview(e.target.value)}
         />
+
         <button className="submit-review-btn" onClick={handleSubmitReview}>
           Submit Review
         </button>
