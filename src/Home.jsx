@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { baseImageUrl } from "./data";
 import "./Home.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BsBookmarkPlusFill, BsBookmarkCheckFill } from "react-icons/bs";
 import { Moviecontext } from "./Component/Router";
 import { options } from "./data";
@@ -9,15 +9,16 @@ import { toast } from "react-toastify";
 
 function Home({ urls, heading, btn1, btn2 }) {
   const [movieData, setMovieData] = useState([]);
-  const [showData, setShowData] = useState([urls[0]]); 
+  const [showData, setShowData] = useState([urls[0]]);
   const [loading, setLoading] = useState(true);
 
   let { Addtowatchlist, removeFromWatchlist, isInWatchlist, user } =
     useContext(Moviecontext);
 
   const navigate = useNavigate();
+  const location = useLocation()
 
-  const currentUrl = showData[0]; 
+  const currentUrl = showData[0];
   const isTV = currentUrl.includes("tv");
   const isPerson = currentUrl.includes("person");
 
@@ -59,14 +60,14 @@ function Home({ urls, heading, btn1, btn2 }) {
           <div className="toggle-buttons">
             <button
               className={currentUrl === urls[0] ? "active-btn" : ""}
-              onClick={() => setShowData([urls[0]])} 
+              onClick={() => setShowData([urls[0]])}
             >
               {btn1}
             </button>
 
             <button
               className={currentUrl === urls[1] ? "active-btn" : ""}
-              onClick={() => setShowData([urls[1]])} 
+              onClick={() => setShowData([urls[1]])}
             >
               {btn2}
             </button>
@@ -113,18 +114,19 @@ function Home({ urls, heading, btn1, btn2 }) {
                 )}
 
                 <button
-                  onClick={() => {
+                  onClick={async(e) => {
+                    e.preventDefault
                     if (!user) {
                       toast.warning("please Login first");
-                      navigate("/login");
+                      navigate(`/login?next=${location.pathname}`,{state:{pendingMovie :item}});
                       return;
                     }
 
                     if (isInWatchlist(item.id)) {
-                      removeFromWatchlist(item.id);
+                     await removeFromWatchlist(item.id);
                       toast.error("Removed from Watchlist ❌");
                     } else {
-                      Addtowatchlist(item);
+                    await  Addtowatchlist(item);
                       toast.success("Added to Watchlist ❤️", {
                         toastId: item.id,
                       });

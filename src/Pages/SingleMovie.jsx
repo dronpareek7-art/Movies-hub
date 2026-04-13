@@ -22,7 +22,7 @@ function SingleMovie() {
   const [cast, setCast] = useState([]);
   const [reviews, setReviews] = useState([]);
 
-  const [userReview, setUserReview] = useState(""); 
+  const [userReview, setUserReview] = useState("");
   const [customReviews, setCustomReviews] = useState([]);
 
   const isTV = Location.pathname.includes("/tv");
@@ -73,7 +73,7 @@ function SingleMovie() {
       const reviewData = await reviewRes.json();
 
       setMovie(movieData);
-      setCast(castData.cast || []); 
+      setCast(castData.cast || []);
       setReviews((reviewData.results || []).slice(0, 5));
     } catch (err) {
       console.log(err);
@@ -135,8 +135,46 @@ function SingleMovie() {
     );
   }
 
-  if (!movie) return <div className="loading">Loading...</div>;
+  if (!movie)
+    return (
+      <>
+        <div className="single-movie">
+          <div className="movie-container">
+            <div className="skeleton poster"></div>
 
+            <div className="movie-details">
+              <div className="skeleton title"></div>
+
+              <div className="skeleton text"></div>
+              <div className="skeleton text"></div>
+              <div className="skeleton text"></div>
+
+              <div className="skeleton text small"></div>
+              <div className="skeleton text small"></div>
+
+              <div className="btn-group">
+                <div className="skeleton btn"></div>
+                <div className="skeleton btn"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="cast-wrapper">
+          <h2 className="cast-heading">Cast</h2>
+
+          <div className="cast-container">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div className="cast-card" key={i}>
+                <div className="skeleton cast-img"></div>
+                <div className="skeleton cast-text"></div>
+                <div className="skeleton cast-text small"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </>
+    );
   return (
     <>
       <div
@@ -199,14 +237,17 @@ function SingleMovie() {
 
               <button
                 className="watchlist-btn"
-                onClick={() => {
+                onClick={ async() => {
                   if (!user) {
-                    navigate("/login");
+                    navigate(`/login?next=${Location.pathname}`, {
+                      state: { pendingMovie:movie},
+                    });
+
                     return;
                   }
                   isInWatchlist(movie.id)
-                    ? removeFromWatchlist(movie.id)
-                    : Addtowatchlist(movie);
+                  ?  await removeFromWatchlist(movie.id)
+                    :await Addtowatchlist(movie);
                 }}
               >
                 {isInWatchlist(movie.id) ? (
@@ -232,12 +273,12 @@ function SingleMovie() {
                 Show Nearest Theater
               </button>
 
-              {loading && <p>Fetching your Location...</p>}
-              {error && <p>{error}</p>}
-              {city && <p>📍 {city}</p>}
+              {loading && <p style={{color:"white"}}>Fetching your Location...</p>}
+              {error && <p style={{color:"white"}}>{error}</p>}
+              {city && <p style={{color:"white"}}>📍 {city}</p>}
 
               {loadingTheatre ? (
-                <p>Loading theatres...</p>
+                <p style={{color:"white"}}>Loading theatres...</p>
               ) : (
                 <div className="theatre-list">
                   {theatres.map((t, i) => (
@@ -266,7 +307,7 @@ function SingleMovie() {
                   </button>
 
                   <iframe
-                    src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1`}
+                    src={`https://www.youtube.com/embed/${trailerKey}`}
                     title="Trailer"
                     allowFullScreen
                   ></iframe>

@@ -6,7 +6,7 @@ import { TfiSearch } from "react-icons/tfi";
 import { useState, useEffect, useRef, useContext } from "react";
 import { Moviecontext } from "./Router";
 import { FiUser } from "react-icons/fi";
-import { options } from "../data"; 
+import { options } from "../data";
 
 function Header() {
   const searchRef = useRef(null);
@@ -91,8 +91,8 @@ function Header() {
 
       <div className="search-bar" ref={searchRef}>
         <div className="search-wrapper">
-          <select  
-          value={genreId}
+          <select
+            value={genreId}
             className="genre-select"
             onChange={(e) => {
               if (e.target.value) {
@@ -114,7 +114,7 @@ function Header() {
 
           <input
             type="text"
-            placeholder="Search Here..."
+            placeholder="Search Movies / Series / Celebrities"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />

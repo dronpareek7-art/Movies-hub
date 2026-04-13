@@ -21,7 +21,7 @@
   position: absolute;
   inset: 0;
   /* background: rgba(2, 6, 23, 0.75); */
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(1px);
   z-index: 1;
 }
 
@@ -533,7 +533,7 @@
 
 .no-image {
   width: 100%;
-  height: 250px;
+  height: 228px;
   background: #1e293b;
   border-radius: 12px;
 }
@@ -556,7 +556,7 @@
 }
 
 .reviews-heading {
-  margin: 5px 15px; 
+  margin: 5px 15px;
   background: linear-gradient(to right, #fff, #60a5fa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -564,7 +564,7 @@
 
 .reviews-container {
   display: grid;
-  grid-template-columns: repeat(2,1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
 .rating {
@@ -613,8 +613,14 @@
 
 .custom-review-section {
   margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* 🔥 left align everything */
+  gap: 15px;
+  margin-left: 30px;
 }
 
+/* textarea */
 .review-textarea {
   width: 50%;
   height: 120px;
@@ -622,10 +628,25 @@
   border-radius: 10px;
   border: none;
   outline: none;
-  margin: 15px 30px;
   font-size: 14px;
   background: rgba(255, 255, 255, 0.1);
   color: white;
+}
+
+/* button */
+.submit-review-btn {
+  padding: 10px 22px;
+  background: #e50914;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.submit-review-btn:hover {
+  background: #b20710;
 }
 
 .review-textarea::placeholder {
@@ -642,22 +663,6 @@
   transform: scale(1.2);
 }
 
-/* Submit button */
-.submit-review-btn {
-  padding: 10px 22px;
-  background: #e50914;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: 0.3s;
-  margin: 0px 30px;
-}
-
-.submit-review-btn:hover {
-  background: #b20710;
-}
 @media (max-width: 768px) {
   .cast-card {
     width: 150px;
@@ -665,7 +670,10 @@
 
   .cast-card img,
   .no-image {
-    height: auto;
+    height: 228px;
+  }
+  .review-textarea {
+    width: 60%;
   }
 }
 
@@ -676,11 +684,14 @@
 
   .cast-card img,
   .no-image {
-    height: auto;
+    height: 220px;
   }
 
   .cast-heading {
     font-size: 18px;
+  }
+  .review-textarea {
+    width: 60%;
   }
 }
 

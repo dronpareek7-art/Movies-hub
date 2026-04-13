@@ -121,7 +121,7 @@ function LocationData() {
         },
         {
           enableHighAccuracy: true, 
-          timeout: 15000, // 10 seconds
+          timeout: 15000, 
           maximumAge: 300000, 
         }
       );

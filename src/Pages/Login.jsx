@@ -4,7 +4,7 @@ import { GiFilmProjector } from "react-icons/gi";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { sendPasswordResetEmail } from "firebase/auth";
 const Login = () => {
@@ -12,7 +12,11 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate();
+  const pendingMovie = location.state?.pendingMovie || null;
+  const nextPath = searchParams.get("next") || "/";
+
   async function handleSignup(email, password) {
     if (password !== confirmPassword) {
       alert("Passwords do not match ❌");
@@ -21,8 +25,11 @@ const Login = () => {
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      toast.info("Signup successful ✅");
-      navigate("/");
+      if (pendingMovie) {
+        AddToWatchlist(pendingMovie);
+      }
+      alert("Signup successful ✅");
+      navigate(nextPath);
     } catch (err) {
       alert(err.message);
     }
@@ -31,9 +38,12 @@ const Login = () => {
   async function handleLogin(email, password) {
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      if (pendingMovie) {
+        AddToWatchlist(pendingMovie);
+      }
 
-      toast.info("Login successful ✅");
-      navigate("/");
+      alert("Login successful ✅");
+      navigate(nextPath);
     } catch (err) {
       alert(err.message);
     }

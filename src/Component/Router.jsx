@@ -18,6 +18,15 @@ import { onAuthStateChanged } from "firebase/auth";
 import ScrollToTop from "./ScrollToTop";
 import GenrePage from "../Pages/GenrePage";
 import Profile from "../Pages/Profile";
+import ProtectedRoute from "./ProtectedRoute";
+import {
+  doc,
+  setDoc,
+  deleteDoc,
+  collection,
+  onSnapshot,
+} from "firebase/firestore";
+import { db } from "../firebase";
 
 function Router() {
   const [Watchlist, setWatchlist] = useState([]);
@@ -29,14 +38,32 @@ function Router() {
     return () => unsub();
   }, []);
 
-  function Addtowatchlist(movieToAdd) {
-    const exists = Watchlist.find((item) => item.id === movieToAdd.id);
-    if (!exists) {
-      setWatchlist([...Watchlist, movieToAdd]);
+  useEffect(() => {
+    if (!user) {
+      setWatchlist([]);
+      return;
     }
+
+    const colRef = collection(db, "watchlists", user.uid, "movies-shows");
+    const unsub = onSnapshot(colRef, (snapshot) => {
+      const movies = snapshot.docs.map((doc) => doc.data());
+      setWatchlist(movies);
+    });
+
+    return () => unsub();
+  }, [user]);
+
+  async function Addtowatchlist(MovieToAdd) {
+    const docId = `${MovieToAdd.media_type || (MovieToAdd.first_air_date ? "tv" : "movie")}_${MovieToAdd.id}`;
+    const docRef = doc(db, "watchlists", user.uid, "movies-shows", docId);
+    await setDoc(docRef, MovieToAdd);
   }
-  function removeFromWatchlist(id) {
-    setWatchlist((prev) => prev.filter((item) => item.id !== id));
+
+  async function removeFromWatchlist(IdToRemove) {
+    const found = WatchList.find((item) => item.id === IdToRemove);
+    const docId = `${found.media_type || (found.first_air_date ? "tv" : "movie")}_${IdToRemove}`;
+    const docRef = doc(db, "watchlists", user.uid, "movies-shows", docId);
+    await deleteDoc(docRef);
   }
   const isInWatchlist = (id) => {
     return Watchlist.some((item) => item.id === id);
@@ -107,13 +134,27 @@ function Router() {
             }
           />
           <Route path="/Login" element={<Login />}></Route>
-          <Route path="/Watchlist" element={<WatchList />}></Route>
+          <Route
+            path="/Watchlist"
+            element={
+              <ProtectedRoute>
+                <WatchList />
+              </ProtectedRoute>
+            }
+          ></Route>
           <Route path="/movie/:id" element={<SingleMovie />} />
           <Route path="/tv/:id" element={<SingleMovie />} />
           <Route path="/person/:id" element={<SinglePerson />} />
-          <Route path="/genre/:id" element={<GenrePage/>}/>
+          <Route path="/genre/:id" element={<GenrePage />} />
           <Route path="*" element={<NotFound />}></Route>
-          <Route path="/profile" element={<Profile/>}></Route>
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          ></Route>
         </Routes>
         <Footer />
         <ToastContainer

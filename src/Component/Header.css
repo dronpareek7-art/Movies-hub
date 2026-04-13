@@ -70,13 +70,14 @@
   border-radius: 30px;
   overflow: visible;
   width: 100%;
-
   transition: 0.3s;
 }
 
 .search-wrapper:focus-within {
   background: rgba(255, 255, 255, 0.12);
   box-shadow: 0 0 12px rgba(244, 63, 94, 0.4);
+border: 0.5px  #f43f5e solid ;
+
 }
 
 .search-wrapper input {
@@ -249,7 +250,7 @@
   }
 
   .search-wrapper {
-    max-width: 260px;
+    max-width: 380px;
   }
 
   .nav-links {
@@ -360,4 +361,10 @@
   .search-wrapper {
     height: 38px;
   }
+}
+@media(max-width:380px){
+  .search-wrapper input{
+    font-size: 12px;
+  }
+  
 }

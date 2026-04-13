@@ -1,7 +1,6 @@
 import "./Fotter.css";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { IoLogoInstagram } from "react-icons/io5";
-import { FaFacebook } from "react-icons/fa6";
-import { FaTwitter } from "react-icons/fa";
 import { RiMovie2AiFill } from "react-icons/ri";
 import { Link } from "react-router-dom";
 
@@ -39,24 +38,34 @@ function Footer() {
           <Link to="/">Upcoming</Link>
         </div>
 
-        <div className="footer-section">
-          <h3>Follow Us</h3>
-          <div className="socials">
-            <a
-              href="https://instagram.com/dron_pareek"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <IoLogoInstagram />
-            </a>
-            <a href="#">
-              <FaFacebook />
-            </a>
-            <a href="#">
-              <FaTwitter />
-            </a>
-          </div>
-        </div>
+     <div className="footer-section">
+  <h3>Follow Us</h3>
+  <div className="socials">
+    <a
+      href="https://github.com/dronpareek7-art"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <FaGithub />
+    </a>
+
+    <a
+      href="https://instagram.com/dron_pareek"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <IoLogoInstagram />
+    </a>
+
+    <a
+      href="https://linkedin.com/drona-pareek"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <FaLinkedin />
+    </a>
+  </div>
+</div>
       </div>
 
       <div className="footer-bottom">© 2026 MovieHub. All rights reserved.</div>
