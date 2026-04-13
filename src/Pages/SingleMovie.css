@@ -564,8 +564,7 @@
 
 .reviews-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));  gap: 20px;
 }
 .rating {
   margin: 15px 30px;

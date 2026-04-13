@@ -38,34 +38,34 @@ function Footer() {
           <Link to="/">Upcoming</Link>
         </div>
 
-     <div className="footer-section">
-  <h3>Follow Us</h3>
-  <div className="socials">
-    <a
-      href="https://github.com/dronpareek7-art"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <FaGithub />
-    </a>
+        <div className="footer-section">
+          <h3>Follow Us</h3>
+          <div className="socials">
+            <a
+              href="https://github.com/dronpareek7-art"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaGithub />
+            </a>
 
-    <a
-      href="https://instagram.com/dron_pareek"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <IoLogoInstagram />
-    </a>
+            <a
+              href="https://instagram.com/dron_pareek"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <IoLogoInstagram />
+            </a>
 
-    <a
-      href="https://linkedin.com/drona-pareek"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <FaLinkedin />
-    </a>
-  </div>
-</div>
+            <a
+              href="https://www.linkedin.com/in/drona-pareek/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaLinkedin />
+            </a>
+          </div>
+        </div>
       </div>
 
       <div className="footer-bottom">© 2026 MovieHub. All rights reserved.</div>
