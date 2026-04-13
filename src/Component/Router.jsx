@@ -60,7 +60,7 @@ function Router() {
   }
 
   async function removeFromWatchlist(IdToRemove) {
-    const found = WatchList.find((item) => item.id === IdToRemove);
+    const found = Watchlist.find((item) => item.id === IdToRemove);
     const docId = `${found.media_type || (found.first_air_date ? "tv" : "movie")}_${IdToRemove}`;
     const docRef = doc(db, "watchlists", user.uid, "movies-shows", docId);
     await deleteDoc(docRef);
