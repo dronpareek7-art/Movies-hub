@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Login from "../Pages/Login";
 import Home from "../Home";
 import SingleMovie from "../Pages/SingleMovie";
@@ -19,6 +19,7 @@ import ScrollToTop from "./ScrollToTop";
 import GenrePage from "../Pages/GenrePage";
 import Profile from "../Pages/Profile";
 import ProtectedRoute from "./ProtectedRoute";
+import AiActorPopup from "./AiActorPopup";
 import {
   doc,
   setDoc,
@@ -27,13 +28,17 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "../firebase";
+import { FaLessThanEqual } from "react-icons/fa";
 
 function Router() {
   const [Watchlist, setWatchlist] = useState([]);
   const [user, setUser] = useState(null);
+  const[loading,setLoading] = useState(true)
+  const location = useLocation()
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
+      setLoading(false)
     });
     return () => unsub();
   }, []);
@@ -77,9 +82,14 @@ function Router() {
         alert(error.message);
       });
   }
+  useEffect(() => {
+    if (user && location.state?.pendingMovie) {
+      Addtowatchlist(location.state.pendingMovie);
+    }
+  }, [user]);
 
   return (
-    <BrowserRouter>
+    // <BrowserRouter>
       <Moviecontext.Provider
         value={{
           Watchlist,
@@ -89,9 +99,11 @@ function Router() {
           isInWatchlist,
           handleLogout,
           user,
+          loading
         }}
       >
         <Header />
+        <AiActorPopup/>
         <ScrollToTop />
         <Routes>
           <Route
@@ -165,7 +177,7 @@ function Router() {
           pauseOnHover={false}
         />{" "}
       </Moviecontext.Provider>
-    </BrowserRouter>
+    // </BrowserRouter>
   );
 }
 

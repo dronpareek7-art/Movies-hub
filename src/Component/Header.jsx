@@ -26,7 +26,6 @@ function Header() {
   const dummyPerson = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
   const dummyPoster = "https://via.placeholder.com/92x138?text=No+Image";
 
-  // Close menu and search on route change
   useEffect(() => {
     setMenuOpen(false);
     setSearchOpen(false);
@@ -159,7 +158,6 @@ function Header() {
           </div>
         </div>
 
-        {/* Desktop nav */}
         <nav className="nav-links desktop-nav">
           <Link to="/Watchlist">
             Watchlist <BsBookmarkPlusFill size={16} />
@@ -178,7 +176,6 @@ function Header() {
           </Link>
         </nav>
 
-        {/* Mobile right side: search icon + hamburger */}
         <div className="mobile-actions">
           <button
             className="icon-btn"

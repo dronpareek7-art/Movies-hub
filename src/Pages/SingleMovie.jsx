@@ -24,6 +24,8 @@ function SingleMovie() {
 
   const [userReview, setUserReview] = useState("");
   const [customReviews, setCustomReviews] = useState([]);
+  const [providers, setProviders] = useState([]);
+  const [providerLink, setProviderLink] = useState("");
 
   const isTV = Location.pathname.includes("/tv");
 
@@ -62,15 +64,30 @@ function SingleMovie() {
     try {
       const type = isTV ? "tv" : "movie";
 
-      const [movieRes, castRes, reviewRes] = await Promise.all([
+      const [movieRes, castRes, reviewRes, providerRes] = await Promise.all([
         fetch(`https://api.themoviedb.org/3/${type}/${id}`, options),
         fetch(`https://api.themoviedb.org/3/${type}/${id}/credits`, options),
         fetch(`https://api.themoviedb.org/3/${type}/${id}/reviews`, options),
+        fetch(
+          `https://api.themoviedb.org/3/${type}/${id}/watch/providers`,
+          options,
+        ),
       ]);
 
       const movieData = await movieRes.json();
       const castData = await castRes.json();
       const reviewData = await reviewRes.json();
+
+      const providerData = await providerRes.json();
+      const indiaProviders = providerData.results?.IN;
+
+      if (indiaProviders) {
+        setProviderLink(indiaProviders.link);
+
+        if (indiaProviders.flatrate) {
+          setProviders(indiaProviders.flatrate);
+        }
+      }
 
       setMovie(movieData);
       setCast(castData.cast || []);
@@ -228,6 +245,30 @@ function SingleMovie() {
               <span className="details-heading">Genres:</span>{" "}
               {(movie.genres || []).map((g) => g.name).join(", ")}
             </p>
+            <div className="provider-section">
+              <h2>Available On</h2>
+
+              {providers.length > 0 ? (
+                <div className="provider-list">
+                  {providers.map((p) => (
+                    <a
+                      key={p.provider_id}
+                      href={providerLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="provider-item"
+                    >
+                      <img
+                        src={`https://image.tmdb.org/t/p/w200${p.logo_path}`}
+                        alt={p.provider_name}
+                      />
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <p className="no-provider">Not on streaming yet 🍿</p>
+              )}
+            </div>
 
             <div className="btn-group">
               <button onClick={handleTrailer} className="trailer-btn">
@@ -237,17 +278,17 @@ function SingleMovie() {
 
               <button
                 className="watchlist-btn"
-                onClick={ async() => {
+                onClick={async () => {
                   if (!user) {
                     navigate(`/login?next=${Location.pathname}`, {
-                      state: { pendingMovie:movie},
+                      state: { pendingMovie: movie },
                     });
 
                     return;
                   }
                   isInWatchlist(movie.id)
-                  ?  await removeFromWatchlist(movie.id)
-                    :await Addtowatchlist(movie);
+                    ? await removeFromWatchlist(movie.id)
+                    : await Addtowatchlist(movie);
                 }}
               >
                 {isInWatchlist(movie.id) ? (
@@ -273,12 +314,14 @@ function SingleMovie() {
                 Show Nearest Theater
               </button>
 
-              {loading && <p style={{color:"white"}}>Fetching your Location...</p>}
-              {error && <p style={{color:"white"}}>{error}</p>}
-              {city && <p style={{color:"white"}}>📍 {city}</p>}
+              {loading && (
+                <p style={{ color: "white" }}>Fetching your Location...</p>
+              )}
+              {error && <p style={{ color: "white" }}>{error}</p>}
+              {city && <p style={{ color: "white" }}>📍 {city}</p>}
 
               {loadingTheatre ? (
-                <p style={{color:"white"}}>Loading theatres...</p>
+                <p style={{ color: "white" }}>Loading theatres...</p>
               ) : (
                 <div className="theatre-list">
                   {theatres.map((t, i) => (
