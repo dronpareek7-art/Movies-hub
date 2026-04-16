@@ -209,7 +209,6 @@
   box-shadow: 0 8px 20px rgba(244, 63, 94, 0.6), 0 0 10px rgba(244, 63, 94, 0.4);
 }
 
-
 .mobile-actions {
   display: none;
   align-items: center;
@@ -270,33 +269,57 @@
   transform: scale(1.1);
 }
 
+/* ─────────────────────────────────────────────
+   FIX: mobile-search-bar
+   overflow: hidden was clipping the suggestions
+   dropdown. We now animate using opacity +
+   visibility + translateY instead of max-height,
+   so overflow can stay visible at all times.
+───────────────────────────────────────────── */
 .mobile-search-bar {
   display: none;
   width: 100%;
   padding: 10px 16px;
   background: #0f172a;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
   position: sticky;
   top: 60px;
-  z-index: 999;
 
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease, padding 0.3s ease;
+  /* FIX: must be above movie-cards (z-index: 1 in Home.css)
+     and high enough for the suggestions (z-index: 99999) to show */
+  z-index: 9999;
+
+  /* FIX: overflow visible so absolute suggestions are not clipped */
+  overflow: visible;
+
+  /* Animation via opacity + visibility instead of max-height */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+
   padding-top: 0;
   padding-bottom: 0;
 }
 
 .mobile-search-bar.open {
-  max-height: 80px;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
   padding: 10px 16px;
 }
 
 .mobile-search-bar .search-wrapper {
   width: 100%;
   height: 40px;
+  /* FIX: ensure wrapper doesn't clip suggestions */
+  overflow: visible;
 }
 
+/* ─────────────────────────────────────────────
+   Mobile menu sits below the search bar
+───────────────────────────────────────────── */
 .mobile-menu {
   display: none;
   flex-direction: column;
