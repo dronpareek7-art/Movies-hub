@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./Login.css";
-import { GiFilmProjector } from "react-icons/gi";
+import { RiMovie2AiFill } from "react-icons/ri";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -66,7 +66,7 @@ const Login = () => {
     <div className="login-container">
       <div className="login-box">
         <h1 className="logo-of-login">
-          <GiFilmProjector /> CineScope
+          <RiMovie2AiFill /> Movie-Hub
         </h1>
 
         <h2>{isSignup ? "Create Your Account" : "Welcome Back"}</h2>
