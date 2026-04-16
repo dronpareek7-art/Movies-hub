@@ -9,7 +9,8 @@ import { FiUser, FiMenu, FiX } from "react-icons/fi";
 import { options } from "../data";
 
 function Header() {
-  const searchRef = useRef(null);
+  const desktopSearchRef = useRef(null);
+  const mobileSearchRef = useRef(null);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [genres, setGenres] = useState([]);
@@ -55,7 +56,13 @@ function Header() {
 
   useEffect(() => {
     function handleClickOutside(e) {
-      if (searchRef.current && !searchRef.current.contains(e.target)) {
+      const inDesktop =
+        desktopSearchRef.current &&
+        desktopSearchRef.current.contains(e.target);
+      const inMobile =
+        mobileSearchRef.current &&
+        mobileSearchRef.current.contains(e.target);
+      if (!inDesktop && !inMobile) {
         setSuggestions([]);
       }
     }
@@ -80,23 +87,57 @@ function Header() {
   }, []);
 
   function handleClick(item) {
-    if (!item.media_type) return;
-    navigate(`/${item.media_type}/${item.id}`);
+    const type =
+      item.media_type ||
+      (item.first_air_date ? "tv" : null) ||
+      (item.release_date !== undefined ? "movie" : null);
+    if (!type || type === "collection") return;
+    navigate(`/${type}/${item.id}`);
     setQuery("");
     setSuggestions([]);
     setSearchOpen(false);
   }
 
+  const SuggestionList = () =>
+    suggestions.length > 0 ? (
+      <div className="suggestions">
+        {suggestions.map((item) => (
+          <div
+            key={item.id}
+            className="suggestion-item"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => handleClick(item)}
+          >
+            <img
+              src={
+                item.media_type === "person"
+                  ? item.profile_path
+                    ? `https://image.tmdb.org/t/p/w92${item.profile_path}`
+                    : dummyPerson
+                  : item.poster_path
+                    ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
+                    : dummyPoster
+              }
+              alt={item.title || item.name}
+            />
+            <div>
+              <p>{item.title || item.name}</p>
+              <span>{item.media_type}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : null;
+
   return (
     <>
       <header className="header">
-        {/* Logo */}
         <Link to="/" className="logo">
           <RiMovie2AiFill /> Movie-Hub
         </Link>
 
         {/* Desktop search bar */}
-        <div className="search-bar desktop-search" ref={searchRef}>
+        <div className="search-bar desktop-search" ref={desktopSearchRef}>
           <div className="search-wrapper">
             <select
               value={genreId}
@@ -127,34 +168,7 @@ function Header() {
               <TfiSearch />
             </button>
 
-            {suggestions.length > 0 && (
-              <div className="suggestions">
-                {suggestions.map((item) => (
-                  <div
-                    key={item.id}
-                    className="suggestion-item"
-                    onClick={() => handleClick(item)}
-                  >
-                    <img
-                      src={
-                        item.media_type === "person"
-                          ? item.profile_path
-                            ? `https://image.tmdb.org/t/p/w92${item.profile_path}`
-                            : dummyPerson
-                          : item.poster_path
-                            ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
-                            : dummyPoster
-                      }
-                      alt={item.title || item.name}
-                    />
-                    <div>
-                      <p>{item.title || item.name}</p>
-                      <span>{item.media_type}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <SuggestionList />
           </div>
         </div>
 
@@ -176,6 +190,7 @@ function Header() {
           </Link>
         </nav>
 
+        {/* Mobile icons */}
         <div className="mobile-actions">
           <button
             className="icon-btn"
@@ -201,9 +216,9 @@ function Header() {
         </div>
       </header>
 
-      {/* Mobile search bar (slides down) */}
+      {/* Mobile search bar */}
       <div className={`mobile-search-bar ${searchOpen ? "open" : ""}`}>
-        <div className="search-wrapper" ref={searchRef}>
+        <div className="search-wrapper" ref={mobileSearchRef}>
           <select
             value={genreId}
             className="genre-select"
@@ -235,34 +250,7 @@ function Header() {
             <TfiSearch />
           </button>
 
-          {suggestions.length > 0 && (
-            <div className="suggestions">
-              {suggestions.map((item) => (
-                <div
-                  key={item.id}
-                  className="suggestion-item"
-                  onClick={() => handleClick(item)}
-                >
-                  <img
-                    src={
-                      item.media_type === "person"
-                        ? item.profile_path
-                          ? `https://image.tmdb.org/t/p/w92${item.profile_path}`
-                          : dummyPerson
-                        : item.poster_path
-                          ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
-                          : dummyPoster
-                    }
-                    alt={item.title || item.name}
-                  />
-                  <div>
-                    <p>{item.title || item.name}</p>
-                    <span>{item.media_type}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <SuggestionList />
         </div>
       </div>
 
