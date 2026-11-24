@@ -1,16 +1,24 @@
-# React + Vite
+# Movie-Hub
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A movie and TV discovery app built with React, Vite, TMDB and Firebase.
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. `npm install`
+2. Copy `.env.example` to `.env` and set `VITE_API_TOKEN` (TMDB "API Read Access Token").
+3. `npm run dev`
 
-## React Compiler
+`.env` is git-ignored. Note that any `VITE_` variable is bundled into the browser build, so treat the TMDB
+token as a public, low-privilege, rotatable key (or proxy TMDB through a serverless function for full secrecy).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Structure
 
-## Expanding the ESLint configuration
+- `src/api/tmdb.js` – the only place that talks to TMDB (Bearer auth, caching, request de-duplication)
+- `src/hooks/` – `useTmdb`, `usePaged` (infinite lists), `useDebounce`, shared helpers
+- `src/context/` – auth + Firestore watchlist provider (`Moviecontext`)
+- `src/Component/` – Header, SearchBox, Hero, Row (sliders), MediaCard, MediaGrid, TrailerModal, states
+- `src/Pages/` – Details, Person, Browse ("See all"), Genre, Search, Watchlist, Login, Profile, 404
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Firestore
+
+Unchanged: `watchlists/{uid}/movies-shows/{movie|tv}_{id}`, `users/{uid}`, `reviews` (new reviews also store `mediaType`).

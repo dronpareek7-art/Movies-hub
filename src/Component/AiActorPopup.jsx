@@ -1,205 +1,137 @@
-import React, { useState, useEffect } from 'react';
-import { useContext } from 'react';
-import { Moviecontext } from './Router';
-import './AiActorPopup.css';
+import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { FiX } from "react-icons/fi";
+import { img, tmdb } from "../api/tmdb";
+import { Moviecontext } from "../context/movieContext";
+import "./AiActorPopup.css";
 
-const TMDB_API_KEY = import.meta.env.VITE_API_KEY; 
+// First-login welcome: pick a favourite actor and read a short note about them.
+// Actors and biographies now come straight from TMDB, so no third-party AI key
+// needs to ship inside the browser bundle.
+function firstSentences(text, count = 2) {
+  const parts = (text || "").replace(/\s+/g, " ").match(/[^.!?]+[.!?]+/g) || [];
+  return parts.slice(0, count).join(" ").trim();
+}
 
-const OnboardingPopup = () => {
+export default function OnboardingPopup() {
   const { user } = useContext(Moviecontext);
-
-  const [showModal, setShowModal] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const [step, setStep] = useState(1);
-  const [selectedGender, setSelectedGender] = useState(null);
-  const [selectedActor, setSelectedActor] = useState(null);
+  const [gender, setGender] = useState(null);
+  const [actors, setActors] = useState({ male: [], female: [] });
   const [loadingActors, setLoadingActors] = useState(false);
+  const [actor, setActor] = useState(null);
+  const [fact, setFact] = useState("");
   const [loadingFact, setLoadingFact] = useState(false);
-  
-  const [randomMaleActors, setRandomMaleActors] = useState([]);
-  const [randomFemaleActors, setRandomFemaleActors] = useState([]);
-  const [funFact, setFunFact] = useState("");
 
-  // ================== 1. AI se Names lo ==================
-  const fetchActorsFromAI = async () => {
+  const key = user ? `onboardingCompleted_${user.uid}` : null;
+  const show = Boolean(user) && !dismissed && !localStorage.getItem(key);
+
+  useEffect(() => {
+    if (!show) return undefined;
+    let alive = true;
     setLoadingActors(true);
-    try {
-      const GROQ_API_KEY = import.meta.env.VITE_GROQ_KEY;
+    Promise.all([tmdb("/person/popular", { page: 1 }), tmdb("/person/popular", { page: 2 })])
+      .then(([a, b]) => {
+        if (!alive) return;
+        const all = [...(a.results || []), ...(b.results || [])].filter((p) => p.profile_path && p.known_for_department === "Acting");
+        setActors({
+          male: all.filter((p) => p.gender === 2).slice(0, 6),
+          female: all.filter((p) => p.gender === 1).slice(0, 6),
+        });
+      })
+      .catch(() => {})
+      .finally(() => alive && setLoadingActors(false));
+    return () => {
+      alive = false;
+    };
+  }, [show]);
 
-      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${GROQ_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "llama-3.1-8b-instant",
-          messages: [{
-            role: "user",
-            content: "Give me 4 popular male actors and 4 popular female actors right now. Return only JSON: {male: [names], female: [names]}"
-          }],
-          max_tokens: 200,
-          temperature: 0.8
-        })
-      });
+  useEffect(() => {
+    if (!show) return undefined;
+    const onKey = (e) => e.key === "Escape" && finish();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [show]);
 
-      const data = await res.json();
-      const content = data.choices[0].message.content;
-      const json = JSON.parse(content.match(/\{.*\}/s)[0]);
+  function finish() {
+    if (key) localStorage.setItem(key, "true");
+    setDismissed(true);
+  }
 
-      const maleNames = json.male || [];
-      const femaleNames = json.female || [];
-
-      const fetchImage = async (name) => {
-        try {
-          const searchRes = await fetch(
-            `https://api.themoviedb.org/3/search/person?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(name)}`
-          );
-          const searchData = await searchRes.json();
-          
-          const person = searchData.results[0];
-          if (person?.profile_path) {
-            return `https://image.tmdb.org/t/p/w300${person.profile_path}`;
-          }
-        } catch (e) {}
-        return `https://picsum.photos/id/${Math.floor(Math.random()*100)+100}/300/300`; // fallback
-      };
-
-      const maleWithImages = await Promise.all(
-        maleNames.map(async (name) => ({
-          name,
-          image: await fetchImage(name)
-        }))
-      );
-
-      const femaleWithImages = await Promise.all(
-        femaleNames.map(async (name) => ({
-          name,
-          image: await fetchImage(name)
-        }))
-      );
-
-      setRandomMaleActors(maleWithImages);
-      setRandomFemaleActors(femaleWithImages);
-
-    } catch (error) {
-      console.error(error);
-      setRandomMaleActors([
-        { name: "Shah Rukh Khan", image: "https://image.tmdb.org/t/p/w300/5qHNjhtj4F0h5q7q9q7q7q7q7q7q.jpg" },
-        { name: "Hrithik Roshan", image: "https://image.tmdb.org/t/p/w300/1f2f2f2f2f2f2f2f2f2f2f2f2f2f2f.jpg" }
-      ]);
-    } finally {
-      setLoadingActors(false);
-    }
-  };
-
-  const generateFunFact = async (actorName) => {
+  async function choose(person) {
+    setActor(person);
+    setStep(3);
     setLoadingFact(true);
-    setFunFact("");
     try {
-      const GROQ_API_KEY = import.meta.env.VITE_GROQ_KEY;
-      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
-        body: JSON.stringify({
-          model: "llama-3.1-8b-instant",
-          messages: [
-            { role: "system", content: "Give one short interesting fun fact about this actor." },
-            { role: "user", content: `Fun fact about ${actorName}` }
-          ],
-          max_tokens: 120,
-          temperature: 0.9
-        })
-      });
-      const data = await res.json();
-      setFunFact(data.choices[0].message.content.trim());
+      const full = await tmdb(`/person/${person.id}`);
+      setFact(firstSentences(full.biography) || `${person.name} is one of the most searched actors on Movie-Hub right now.`);
     } catch {
-      setFunFact(`${actorName} is a very talented and popular actor.`);
+      setFact(`${person.name} is one of the most searched actors on Movie-Hub right now.`);
     } finally {
       setLoadingFact(false);
     }
-  };
+  }
 
-  useEffect(() => {
-    if (!user) return;
-    const key = `onboardingCompleted_${user.uid}`;
-    if (!localStorage.getItem(key)) {
-      setShowModal(true);
-      setStep(1);
-      fetchActorsFromAI();
-    }
-  }, [user]);
-
-  const handleGenderSelect = (gender) => {
-    setSelectedGender(gender);
-    setStep(2);
-  };
-
-  const handleActorSelect = async (actor) => {
-    setSelectedActor(actor);
-    setStep(3);
-    await generateFunFact(actor.name);
-  };
-
-  const handleComplete = () => {
-    if (user) localStorage.setItem(`onboardingCompleted_${user.uid}`, 'true');
-    setShowModal(false);
-  };
-
-  if (!showModal || !user) return null;
+  if (!show) return null;
+  const list = gender ? actors[gender] : [];
 
   return (
-    <div className="onboarding-overlay">
-      <div className="onboarding-modal">
-        <div className="modal-header">
-          <h2>Personalize Your Experience</h2>
-          <button className="popup-close-btn" onClick={handleComplete}>×</button>
-        </div>
+    <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && finish()}>
+      <div className="modal onboarding" role="dialog" aria-modal="true" aria-labelledby="onb-title">
+        <button className="modal-close" onClick={finish} aria-label="Skip personalisation"><FiX /></button>
+        <div className="onb-body">
+          <h2 id="onb-title">Welcome to Movie-Hub</h2>
 
-        {step === 1 && (
-          <div className="step">
-            <p>Do you prefer Male or Female actors?</p>
-            <div className="gender-buttons">
-              <button onClick={() => handleGenderSelect('male')} disabled={loadingActors}>
-                Male Actors
-              </button>
-              <button onClick={() => handleGenderSelect('female')} disabled={loadingActors}>
-                Female Actors
-              </button>
-            </div>
-            {loadingActors && <p className="loading">AI is finding fresh actors with real photos...</p>}
-          </div>
-        )}
+          {step === 1 && (
+            <>
+              <p className="muted">Tell us whose films you enjoy and we'll introduce you to them.</p>
+              <div className="onb-choices">
+                <button className="btn btn-ghost" disabled={loadingActors} onClick={() => { setGender("male"); setStep(2); }}>Actors</button>
+                <button className="btn btn-ghost" disabled={loadingActors} onClick={() => { setGender("female"); setStep(2); }}>Actresses</button>
+              </div>
+              {loadingActors && <p className="muted">Finding popular names…</p>}
+              <button className="link-btn" onClick={finish}>Skip for now</button>
+            </>
+          )}
 
-        {step === 2 && selectedGender && (
-          <div className="step">
-            <p>Choose your favorite {selectedGender} actor:</p>
-            <div className="actors-grid">
-              {(selectedGender === 'male' ? randomMaleActors : randomFemaleActors).map((actor, i) => (
-                <div key={i} className="actor-card" onClick={() => handleActorSelect(actor)}>
-                  <img src={actor.image} alt={actor.name} />
-                  <p>{actor.name}</p>
+          {step === 2 && (
+            <>
+              <p className="muted">Pick a favourite.</p>
+              {list.length === 0 ? (
+                <p className="muted">We couldn't load names right now.</p>
+              ) : (
+                <div className="onb-actors">
+                  {list.map((p) => (
+                    <button key={p.id} onClick={() => choose(p)}>
+                      <img src={img(p.profile_path, "w185")} alt="" />
+                      <span>{p.name}</span>
+                    </button>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+              )}
+              <button className="link-btn" onClick={() => setStep(1)}>Back</button>
+            </>
+          )}
 
-        {step === 3 && selectedActor && (
-          <div className="step">
-            <h3>Fun Fact about {selectedActor.name}</h3>
-            {loadingFact ? (
-              <p className="loading">🤖 Generating fun fact...</p>
-            ) : (
-              <p className="fun-fact">{funFact}</p>
-            )}
-            <button className="continue-btn" onClick={handleComplete} disabled={loadingFact}>
-              Continue to Website
-            </button>
-          </div>
-        )}
+          {step === 3 && actor && (
+            <>
+              <div className="onb-fact">
+                <img src={img(actor.profile_path, "w185")} alt="" />
+                <div>
+                  <h3>{actor.name}</h3>
+                  {loadingFact ? <div className="skeleton" style={{ height: 64, width: "100%" }} /> : <p>{fact}</p>}
+                </div>
+              </div>
+              <div className="onb-choices">
+                <Link className="btn btn-ghost" to={`/person/${actor.id}`} onClick={finish}>See their films</Link>
+                <button className="btn btn-primary" onClick={finish} disabled={loadingFact}>Start exploring</button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
-};
-
-export default OnboardingPopup;
+}
