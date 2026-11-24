@@ -1,192 +1,83 @@
-import React, { useEffect, useState, useContext, useRef } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { baseImageUrl } from "../data";
-import "./GenrePage.css";
-import { Moviecontext } from "../Component/Router";
-import { BsBookmarkPlusFill, BsBookmarkCheckFill } from "react-icons/bs";
-import { toast } from "react-toastify";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { tagType } from "../api/tmdb";
+import { usePaged } from "../hooks/useTmdb";
+import { useDocumentTitle, useGenres } from "../hooks/useMisc";
+import MediaGrid from "../Component/MediaGrid";
+import Segmented from "../Component/Segmented";
+import "./Browse.css";
 
-const GenrePage = () => {
+const TYPES = [{ value: "movie", label: "Movies" }, { value: "tv", label: "TV Shows" }];
+const SORTS = [
+  { value: "popularity.desc", label: "Most popular" },
+  { value: "vote_average.desc", label: "Highest rated" },
+  { value: "date.desc", label: "Newest first" },
+  { value: "date.asc", label: "Oldest first" },
+];
+
+export default function GenrePage() {
   const { id } = useParams();
-
-  const [movies, setMovies] = useState([]);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-
-  const observer = useRef(null);
   const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
+  const type = params.get("type") === "tv" ? "tv" : "movie";
+  const sort = SORTS.some((s) => s.value === params.get("sort")) ? params.get("sort") : "popularity.desc";
+  const { movies, shows } = useGenres();
+  const list = type === "tv" ? shows : movies;
+  const current = list.find((g) => String(g.id) === id);
 
-  let { Addtowatchlist, removeFromWatchlist, isInWatchlist, user } =
-    useContext(Moviecontext);
+  const dateField = type === "tv" ? "first_air_date" : "primary_release_date";
+  const sortBy = sort.startsWith("date") ? `${dateField}.${sort.split(".")[1]}` : sort;
+  const today = new Date().toISOString().slice(0, 10);
 
-  useEffect(() => {
-    async function fetchMovies() {
-      try {
-        setLoading(true);
+  const paged = usePaged(`/discover/${type}`, {
+    with_genres: id,
+    sort_by: sortBy,
+    include_adult: false,
+    // Rating sort needs a vote floor, otherwise one-vote 10/10 titles float to the top.
+    ...(sort === "vote_average.desc" ? { "vote_count.gte": 300 } : {}),
+    // "Newest first" shouldn't start with unreleased titles.
+    ...(sort === "date.desc" ? { [`${dateField}.lte`]: today, "vote_count.gte": 5 } : {}),
+  });
+  const tagged = { ...paged, items: tagType(paged.items, type) };
 
-        const API_KEY = import.meta.env.VITE_API_KEY;
+  const name = current?.name || "Genre";
+  useDocumentTitle(`${name} ${type === "tv" ? "TV shows" : "movies"}`);
 
-        const res = await fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${id}&page=${page}`
-        );
-
-        const data = await res.json();
-
-        if (!data.results || data.results.length === 0) {
-          setHasMore(false);
-          return;
-        }
-
-        setMovies((prev) => {
-          const newMovies = data.results;
-
-          const uniqueMovies = newMovies.filter(
-            (newMovie) => !prev.some((old) => old.id === newMovie.id)
-          );
-
-          return [...prev, ...uniqueMovies];
-        });
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (hasMore) fetchMovies();
-  }, [id, page]);
-
-  useEffect(() => {
-    setMovies([]);
-    setPage(1);
-    setHasMore(true);
-  }, [id]);
-
-  const lastMovieRef = (node) => {
-    if (loading || !hasMore) return;
-
-    if (observer.current) observer.current.disconnect();
-
-    observer.current = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          observer.current.disconnect(); 
-          setPage((prev) => prev + 1);
-        }
-      },
-      {
-        rootMargin: "200px",
-      }
-    );
-
-    if (node) observer.current.observe(node);
-  };
+  function switchType(next) {
+    // Movie and TV genre ids differ for a few genres, so map by name when possible.
+    const other = (next === "tv" ? shows : movies).find((g) => g.name === current?.name);
+    const target = other?.id ?? id;
+    navigate(`/genre/${target}?type=${next}&sort=${sort}`, { replace: true });
+  }
 
   return (
-    <div className="genre-section">
-      <header className="genre-header">
-        <h2>Movies</h2>
-      </header>
-
-      <div className="genre-grid">
-        {loading && page === 1 &&
-          Array(12)
-            .fill(0)
-            .map((_, i) => (
-              <div className="genre-card" key={i}>
-                <div className="skeleton skeleton-img"></div>
-                <div className="film-info">
-                  <div className="skeleton skeleton-text"></div>
-                  <div className="skeleton skeleton-text"></div>
-                  <div className="skeleton skeleton-text small"></div>
-                </div>
-              </div>
-            ))}
-
-        {movies.map((movie, index) => {
-          const isLast = index === movies.length - 1;
-
-          return (
-            <div
-              className="genre-card"
-              key={movie.id}
-              ref={isLast ? lastMovieRef : null}
-            >
-              <div className="genre-wrapper">
-                <Link to={`/movie/${movie.id}`}>
-                  <img
-                    src={
-                      movie.poster_path
-                        ? `${baseImageUrl}${movie.poster_path}`
-                        : "https://via.placeholder.com/300x450?text=No+Image"
-                    }
-                    alt={movie.title}
-                    loading="lazy"
-                  />
-                </Link>
-
-                <button
-                  onClick={() => {
-                    if (!user) {
-                      toast.warning("please Login first");
-                      navigate("/login");
-                      return;
-                    }
-
-                    if (isInWatchlist(movie.id)) {
-                      removeFromWatchlist(movie.id);
-                      toast.error("Removed from Watchlist ❌");
-                    } else {
-                      Addtowatchlist(movie);
-                      toast.success("Added to Watchlist ❤️", {
-                        toastId: movie.id,
-                      });
-                    }
-                  }}
-                  className="watchlist-icon"
-                >
-                  {isInWatchlist(movie.id) ? (
-                    <BsBookmarkCheckFill />
-                  ) : (
-                    <BsBookmarkPlusFill />
-                  )}
-                </button>
-
-                <div className="genre-content">
-                  <h3>{movie.title || movie.name}</h3>
-
-                  <p>
-                    {movie.release_date || movie.first_air_date
-                      ? new Date(
-                          movie.release_date || movie.first_air_date
-                        ).toLocaleDateString("en-US", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })
-                      : ""}
-                  </p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+    <div className="page">
+      <div className="page-head">
+        <div>
+          <h1 className="page-title">{name} {type === "tv" ? "TV shows" : "movies"}</h1>
+          <p className="page-sub">Sorted by {SORTS.find((s) => s.value === sort).label.toLowerCase()}.</p>
+        </div>
+        <div className="browse-filters">
+          <Segmented label="Content type" value={type} options={TYPES} onChange={switchType} />
+          <select
+            className="select"
+            aria-label="Sort by"
+            value={sort}
+            onChange={(e) => setParams({ type, sort: e.target.value }, { replace: true })}
+          >
+            {SORTS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+          </select>
+        </div>
       </div>
 
-      {loading && page > 1 && (
-        <p style={{ textAlign: "center", padding: "20px" }}>
-          Loading more...
-        </p>
-      )}
+      <div className="chip-scroll genre-chips">
+        {list.map((g) => (
+          <Link key={g.id} className={`chip ${String(g.id) === id ? "is-active" : ""}`} to={`/genre/${g.id}?type=${type}&sort=${sort}`}>
+            {g.name}
+          </Link>
+        ))}
+      </div>
 
-      {!hasMore && (
-        <p style={{ textAlign: "center", padding: "20px" }}>
-          No more movies 🎬
-        </p>
-      )}
+      <MediaGrid paged={tagged} type={type} />
     </div>
   );
-};
-
-export default GenrePage;
+}

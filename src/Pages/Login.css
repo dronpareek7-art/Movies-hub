@@ -1,150 +1,21 @@
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.login-container {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  background: radial-gradient(circle at top, #020617, #0f172a);
-}
-.login-container::before {
-  content: "";
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(244,63,94,0.2), transparent);
-  filter: blur(120px);
-}
-
-.login-box {
-  width: 360px;
-  padding: 40px;
-  border-radius: 18px;
-
-  background: rgba(30, 41, 59, 0.55);
-  backdrop-filter: blur(14px);
-
-  border: 1px solid rgba(148, 163, 184, 0.1);
-
-  box-shadow:
-    0 0 30px rgba(59, 130, 246, 0.25),
-    0 10px 40px rgba(0, 0, 0, 0.6);
-
-  text-align: center;
-  transition: 0.3s ease;
-}
-.login-box h2 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 30px;
-  letter-spacing: 1.5px;
-
-  background: linear-gradient(to right, #fff, #94a3b8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.login-box:hover {
-  transform: translateY(-5px);
-}
-
-.logo-of-login {
-  font-size: 26px;
-  font-weight: 700;
-  margin-bottom: 10px;
-
-  background: linear-gradient(to right, #f43f5e, #fb7185);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.logo-of-login svg {
-  font-size: 27px;
-  color: #f43f5e;
-}
-
-.login-box h2 {
-  color: #fff;
-  margin-bottom: 25px;
-  font-weight: 600;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.form input {
-  padding: 12px 14px;
-  border-radius: 10px;
-
-  border: 1px solid transparent;
-  outline: none;
-
-  background: rgba(15, 23, 42, 0.85);
-  color: #fff;
-
-  font-size: 14px;
-
-  transition: all 0.3s ease;
-}
-
-.form input::placeholder {
-  color: #94a3b8;
-}
-
-.form input:focus {
-  border: 1px solid #3b82f6;
-  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
-}
-
-.form button {
-  padding: 12px;
-  border-radius: 10px;
-
-  border: none;
-  cursor: pointer;
-
-  font-weight: 600;
-  font-size: 14px;
-
-  background: linear-gradient(135deg, #f43f5e, #e11d48);
-  color: white;
-
-  transition: all 0.3s ease;
-}
-
-.form button:hover {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow:
-    0 0 12px rgba(244, 63, 94, 0.6),
-    0 6px 20px rgba(244, 63, 94, 0.3);
-}
-
-.signup-text {
-  margin-top: 18px;
-  font-size: 14px;
-  color: #94a3b8;
-}
-
-.signup-text span {
-  color: #f43f5e;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.signup-text span:hover {
-  text-decoration: underline;
-}
-
-@media (max-width: 480px) {
-  .login-box {
-    width: 90%;
-    padding: 30px;
-  }
-}
+.auth { position: relative; min-height: 100vh; display: grid; place-items: center; padding: calc(var(--header-h) + 24px) var(--gutter) 48px; overflow: hidden; }
+.auth-wall { position: absolute; inset: -4%; display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; transform: rotate(-5deg) scale(1.08); opacity: 0.5; filter: saturate(0.9); }
+.auth-wall img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 8px; }
+.auth::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(14, 12, 18, 0.55), var(--bg) 78%); }
+.auth-card { position: relative; z-index: 1; width: min(440px, 100%); padding: clamp(24px, 5vw, 40px); border-radius: 22px; background: rgba(22, 19, 29, 0.92); backdrop-filter: blur(18px); border: 1px solid var(--line-strong); box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6); display: grid; gap: 8px; }
+.auth-card h1 { font-family: var(--font-display); font-size: 34px; font-weight: 600; margin-top: 14px; }
+.auth-sub { color: var(--text-dim); margin-bottom: 8px; }
+.auth form { display: grid; gap: 16px; margin-top: 8px; }
+.auth label { display: grid; gap: 6px; font-weight: 700; font-size: 14px; }
+.auth input { height: 48px; padding: 0 16px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line-strong); outline: 0; font-weight: 500; width: 100%; transition: border-color 0.2s; }
+.auth input:focus { border-color: var(--gold); }
+.pw { position: relative; display: block; }
+.pw input { padding-right: 48px; }
+.pw button { position: absolute; right: 4px; top: 4px; width: 40px; height: 40px; display: grid; place-items: center; font-size: 18px; color: var(--text-dim); border-radius: 8px; }
+.pw button:hover { color: var(--text); }
+.forgot { justify-self: end; margin-top: -6px; }
+.auth form .btn { height: 50px; margin-top: 4px; }
+.auth-switch { margin-top: 10px; text-align: center; color: var(--text-dim); font-size: 14.5px; }
+.auth-switch button { color: var(--gold); font-weight: 800; }
+.auth-switch button:hover { text-decoration: underline; }
+@media (max-width: 700px) { .auth-wall { grid-template-columns: repeat(3, 1fr); } }

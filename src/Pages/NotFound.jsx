@@ -1,44 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useDocumentTitle } from "../hooks/useMisc";
+import SearchBox from "../Component/SearchBox";
 import "./NotFound.css";
 
-const NotFound = () => {
-  const navigate = useNavigate();
-  const [count, setCount] = useState(5);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCount((prev) => prev - 1);
-    }, 1000);
-
-    const timer = setTimeout(() => {
-      navigate("/");
-    }, 5000);
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timer);
-    };
-  }, [navigate]);
-
+export default function NotFound() {
+  useDocumentTitle("Page not found");
   return (
     <div className="notfound">
-      <div className="overlay"></div>
-
-      <div className="content-notfound">
-        <h1 className="glitch" data-text="404">
-          404
-        </h1>
-        <h2>Page Not Found</h2>
-
-        <p className="countdown">
-          Redirecting to home in <span>{count}</span> sec...
-        </p>
-
-        <button onClick={() => navigate("/")}>Go Home Now</button>
+      <p className="nf-code" aria-hidden="true">404</p>
+      <h1>This reel is missing</h1>
+      <p className="muted">The page you're looking for doesn't exist or has moved. Try searching for a title instead.</p>
+      <div className="nf-search"><SearchBox /></div>
+      <div className="nf-actions">
+        <Link className="btn btn-primary" to="/">Go to home</Link>
+        <Link className="btn btn-ghost" to="/browse/trending?type=movie">See what's trending</Link>
       </div>
     </div>
   );
-};
-
-export default NotFound;
+}

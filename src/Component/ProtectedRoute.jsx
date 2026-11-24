@@ -1,25 +1,13 @@
-import { useContext, useEffect } from "react";
-import { Moviecontext } from "./Router";
+import { useContext } from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import { Moviecontext } from "../context/movieContext";
+import { PageLoader } from "./States";
 
-function ProtectedRoute({ children }) {
+export default function ProtectedRoute({ children }) {
   const { user, loading } = useContext(Moviecontext);
   const location = useLocation();
 
-  useEffect(() => {
-    if (!loading && !user && location.pathname !== "/login") {
-    }
-  }, [user, loading]);
-
-  if (loading) {
-    return <div className="auth-loader">Checking authentication... </div>;
-  }
-
-  if (!user) {
-    return <Navigate to={`/login?next=${location.pathname}`} replace />;
-  }
-
+  if (loading) return <PageLoader label="Checking your session" />;
+  if (!user) return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />;
   return children;
 }
-
-export default ProtectedRoute;

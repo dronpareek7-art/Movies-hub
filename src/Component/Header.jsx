@@ -1,285 +1,174 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import "./Header.css";
+import { useContext, useEffect, useRef, useState } from "react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { RiMovie2AiFill } from "react-icons/ri";
-import { BsBookmarkPlusFill } from "react-icons/bs";
-import { TfiSearch } from "react-icons/tfi";
-import { useState, useEffect, useRef, useContext } from "react";
-import { Moviecontext } from "./Router";
-import { FiUser, FiMenu, FiX } from "react-icons/fi";
-import { options } from "../data";
+import { FiChevronDown, FiLogOut, FiMenu, FiSearch, FiUser, FiX } from "react-icons/fi";
+import { BsBookmarkHeart } from "react-icons/bs";
+import { Moviecontext } from "../context/movieContext";
+import { useGenres } from "../hooks/useMisc";
+import SearchBox from "./SearchBox";
+import "./Header.css";
 
-function Header() {
-  const desktopSearchRef = useRef(null);
-  const mobileSearchRef = useRef(null);
-  const [query, setQuery] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
-  const [genres, setGenres] = useState([]);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const navigate = useNavigate();
+export default function Header() {
+  const { user, handleLogout, Watchlist } = useContext(Moviecontext);
+  const { movies, shows } = useGenres();
   const location = useLocation();
-
-  const genreId = location.pathname.startsWith("/genre/")
-    ? location.pathname.split("/")[2]
-    : "";
-  const { handleLogout, user } = useContext(Moviecontext);
-
-  const dummyPerson = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-  const dummyPoster = "https://via.placeholder.com/92x138?text=No+Image";
-
-  useEffect(() => {
-    setMenuOpen(false);
-    setSearchOpen(false);
-  }, [location.pathname]);
+  const navigate = useNavigate();
+  const [scrolled, setScrolled] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [mobileSearch, setMobileSearch] = useState(false);
+  const [menu, setMenu] = useState(null); // "genres" | "user" | null
+  const [genreTab, setGenreTab] = useState("movie");
+  const nav = useRef(null);
 
   useEffect(() => {
-    if (query.length < 2) {
-      setSuggestions([]);
-      return;
-    }
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-    const delay = setTimeout(async () => {
-      try {
-        const res = await fetch(
-          `https://api.themoviedb.org/3/search/multi?query=${query}`,
-          options,
-        );
-        const data = await res.json();
-        setSuggestions(data.results?.slice(0, 6) || []);
-      } catch (err) {
-        console.log(err);
-      }
-    }, 400);
-
-    return () => clearTimeout(delay);
-  }, [query]);
+  // Close every popover when the route changes.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDrawer(false);
+    setMobileSearch(false);
+    setMenu(null);
+  }, [location.pathname, location.search]);
 
   useEffect(() => {
-    function handleClickOutside(e) {
-      const inDesktop =
-        desktopSearchRef.current &&
-        desktopSearchRef.current.contains(e.target);
-      const inMobile =
-        mobileSearchRef.current &&
-        mobileSearchRef.current.contains(e.target);
-      if (!inDesktop && !inMobile) {
-        setSuggestions([]);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    const onDown = (e) => nav.current && !nav.current.contains(e.target) && setMenu(null);
+    const onKey = (e) => e.key === "Escape" && setMenu(null);
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
   }, []);
 
   useEffect(() => {
-    async function fetchGenres() {
-      try {
-        const res = await fetch(
-          `https://api.themoviedb.org/3/genre/movie/list`,
-          options,
-        );
-        const data = await res.json();
-        setGenres(data.genres || []);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-    fetchGenres();
-  }, []);
+    document.body.style.overflow = drawer ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [drawer]);
 
-  function handleClick(item) {
-    const type =
-      item.media_type ||
-      (item.first_air_date ? "tv" : null) ||
-      (item.release_date !== undefined ? "movie" : null);
-    if (!type || type === "collection") return;
-    navigate(`/${type}/${item.id}`);
-    setQuery("");
-    setSuggestions([]);
-    setSearchOpen(false);
-  }
+  const genreList = genreTab === "movie" ? movies : shows;
+  const initial = (user?.displayName || user?.email || "?").charAt(0).toUpperCase();
+  const count = Watchlist.length;
 
-  const SuggestionList = () =>
-    suggestions.length > 0 ? (
-      <div className="suggestions">
-        {suggestions.map((item) => (
-          <div
-            key={item.id}
-            className="suggestion-item"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => handleClick(item)}
-          >
-            <img
-              src={
-                item.media_type === "person"
-                  ? item.profile_path
-                    ? `https://image.tmdb.org/t/p/w92${item.profile_path}`
-                    : dummyPerson
-                  : item.poster_path
-                    ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
-                    : dummyPoster
-              }
-              alt={item.title || item.name}
-            />
-            <div>
-              <p>{item.title || item.name}</p>
-              <span>{item.media_type}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    ) : null;
+  const signOut = () => {
+    handleLogout();
+    setMenu(null);
+    setDrawer(false);
+    if (["/watchlist", "/profile"].includes(location.pathname.toLowerCase())) navigate("/");
+  };
 
   return (
     <>
-      <header className="header">
-        <Link to="/" className="logo">
-          <RiMovie2AiFill /> Movie-Hub
-        </Link>
+      <header className={`header ${scrolled || drawer ? "is-solid" : ""}`}>
+        <div className="header-inner" ref={nav}>
+          <Link to="/" className="logo" aria-label="Movie-Hub home">
+            <RiMovie2AiFill />
+            <span>Movie-Hub</span>
+          </Link>
 
-        {/* Desktop search bar */}
-        <div className="search-bar desktop-search" ref={desktopSearchRef}>
-          <div className="search-wrapper">
-            <select
-              value={genreId}
-              className="genre-select"
-              onChange={(e) => {
-                if (e.target.value) navigate(`/genre/${e.target.value}`);
-                else navigate("/");
-              }}
-            >
-              <option value="">All ▼</option>
-              {genres.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.name}
-                </option>
-              ))}
-            </select>
+          <nav className="nav" aria-label="Primary">
+            <NavLink to="/" end>Home</NavLink>
+            <NavLink to="/browse/popular?type=movie">Movies</NavLink>
+            <NavLink to="/browse/popular?type=tv">TV Shows</NavLink>
+            <div className="nav-menu">
+              <button
+                className={`nav-trigger ${menu === "genres" ? "is-open" : ""}`}
+                aria-expanded={menu === "genres"}
+                aria-haspopup="true"
+                onClick={() => setMenu(menu === "genres" ? null : "genres")}
+              >
+                Genres <FiChevronDown />
+              </button>
+              {menu === "genres" && (
+                <div className="popover genre-pop">
+                  <div className="segmented" role="group" aria-label="Genre type">
+                    <button aria-pressed={genreTab === "movie"} onClick={() => setGenreTab("movie")}>Movies</button>
+                    <button aria-pressed={genreTab === "tv"} onClick={() => setGenreTab("tv")}>TV Shows</button>
+                  </div>
+                  <ul>
+                    {genreList.map((g) => (
+                      <li key={g.id}>
+                        <Link to={`/genre/${g.id}?type=${genreTab}`}>{g.name}</Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </nav>
 
-            <div className="divider"></div>
+          <SearchBox className="header-search" />
 
-            <input
-              type="text"
-              placeholder="Search Movies / Series / Celebrities"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-
-            <button className="search-btn">
-              <TfiSearch />
+          <div className="header-actions">
+            <button className="icon-btn search-toggle" aria-label="Open search" onClick={() => { setMobileSearch((v) => !v); setDrawer(false); }}>
+              {mobileSearch ? <FiX /> : <FiSearch />}
             </button>
 
-            <SuggestionList />
+            <NavLink to="/watchlist" className="watch-link" aria-label={`Watchlist, ${count} saved`}>
+              <BsBookmarkHeart />
+              <span className="watch-label">Watchlist</span>
+              {count > 0 && <em>{count > 99 ? "99+" : count}</em>}
+            </NavLink>
+
+            {user ? (
+              <div className="nav-menu">
+                <button className="avatar" aria-label="Account menu" aria-expanded={menu === "user"} onClick={() => setMenu(menu === "user" ? null : "user")}>
+                  {initial}
+                </button>
+                {menu === "user" && (
+                  <div className="popover user-pop">
+                    <p className="user-mail">{user.email}</p>
+                    <Link to="/profile"><FiUser /> Profile</Link>
+                    <Link to="/watchlist"><BsBookmarkHeart /> Watchlist</Link>
+                    <button onClick={signOut}><FiLogOut /> Sign out</button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link to={`/login?next=${encodeURIComponent(location.pathname)}`} className="btn btn-primary btn-sm signin">Sign in</Link>
+            )}
+
+            <button className="icon-btn menu-toggle" aria-label={drawer ? "Close menu" : "Open menu"} aria-expanded={drawer} onClick={() => { setDrawer((v) => !v); setMobileSearch(false); }}>
+              {drawer ? <FiX /> : <FiMenu />}
+            </button>
           </div>
         </div>
 
-        <nav className="nav-links desktop-nav">
-          <Link to="/Watchlist">
-            Watchlist <BsBookmarkPlusFill size={16} />
-          </Link>
-          {user ? (
-            <button onClick={handleLogout} className="login-btn">
-              Log out
-            </button>
-          ) : (
-            <Link to="/login" className="login-btn">
-              Login
-            </Link>
-          )}
-          <Link to="/profile" className="profile-icon">
-            <FiUser size={22} /> Profile
-          </Link>
-        </nav>
-
-        {/* Mobile icons */}
-        <div className="mobile-actions">
-          <button
-            className="icon-btn"
-            onClick={() => {
-              setSearchOpen((prev) => !prev);
-              setMenuOpen(false);
-            }}
-            aria-label="Toggle Search"
-          >
-            <TfiSearch size={18} />
-          </button>
-
-          <button
-            className="icon-btn"
-            onClick={() => {
-              setMenuOpen((prev) => !prev);
-              setSearchOpen(false);
-            }}
-            aria-label="Toggle Menu"
-          >
-            {menuOpen ? <FiX size={22} /> : <FiMenu size={22} />}
-          </button>
-        </div>
+        {mobileSearch && (
+          <div className="mobile-search">
+            <SearchBox autoFocus onDone={() => setMobileSearch(false)} />
+          </div>
+        )}
       </header>
 
-      {/* Mobile search bar */}
-      <div className={`mobile-search-bar ${searchOpen ? "open" : ""}`}>
-        <div className="search-wrapper" ref={mobileSearchRef}>
-          <select
-            value={genreId}
-            className="genre-select"
-            onChange={(e) => {
-              if (e.target.value) navigate(`/genre/${e.target.value}`);
-              else navigate("/");
-              setSearchOpen(false);
-            }}
-          >
-            <option value="">All ▼</option>
-            {genres.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.name}
-              </option>
-            ))}
-          </select>
-
-          <div className="divider"></div>
-
-          <input
-            type="text"
-            placeholder="Search Movies / Series / Celebrities"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            autoFocus={searchOpen}
-          />
-
-          <button className="search-btn">
-            <TfiSearch />
-          </button>
-
-          <SuggestionList />
-        </div>
-      </div>
-
-      {/* Mobile dropdown menu */}
-      <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
-        <Link to="/Watchlist" onClick={() => setMenuOpen(false)}>
-          <BsBookmarkPlusFill size={16} /> Watchlist
-        </Link>
-        <Link to="/profile" onClick={() => setMenuOpen(false)}>
-          <FiUser size={16} /> Profile
-        </Link>
-        {user ? (
-          <button
-            onClick={() => {
-              handleLogout();
-              setMenuOpen(false);
-            }}
-            className="menu-login-btn"
-          >
-            Log out
-          </button>
-        ) : (
-          <Link to="/login" className="menu-login-btn" onClick={() => setMenuOpen(false)}>
-            Login
-          </Link>
-        )}
+      <div className={`drawer ${drawer ? "is-open" : ""}`} aria-hidden={!drawer}>
+        <nav aria-label="Mobile">
+          <Link to="/">Home</Link>
+          <Link to="/browse/popular?type=movie">Movies</Link>
+          <Link to="/browse/popular?type=tv">TV Shows</Link>
+          <Link to="/browse/trending?type=movie&window=day">Trending</Link>
+          <Link to="/browse/upcoming?type=movie">Coming soon</Link>
+          <Link to="/browse/people">Popular cast</Link>
+          <Link to="/watchlist">Watchlist {count > 0 && <em>{count}</em>}</Link>
+          {user && <Link to="/profile">Profile</Link>}
+          <h3>Genres</h3>
+          <div className="chip-row">
+            {movies.map((g) => <Link key={g.id} className="chip" to={`/genre/${g.id}`}>{g.name}</Link>)}
+          </div>
+          {user ? (
+            <button className="btn btn-ghost" onClick={signOut}>Sign out</button>
+          ) : (
+            <Link className="btn btn-primary" to="/login">Sign in</Link>
+          )}
+        </nav>
       </div>
     </>
   );
 }
-
-export default Header;
